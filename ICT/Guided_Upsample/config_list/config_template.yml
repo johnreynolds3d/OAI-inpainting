@@ -11,17 +11,20 @@ VERBOSE: 0          # turns on verbose mode in the output console
 Generator: 0        # 0: original
 No_Bar: True        # Turn off the progressive bar
 
-TRAIN_FLIST: DATASET/place2/Places2_Train_Set/Places
-VAL_FLIST: DATASET/place2/Places2_Train_Set/val
+# Dataset paths - customize these for your setup
+TRAIN_FLIST: ./datasets/place2/Places2_Train_Set/Places
+VAL_FLIST: ./datasets/place2/Places2_Train_Set/val
 TEST_FLIST: ./datasets/places2_test.flist
 
-TRAIN_EDGE_FLIST: ./
-VAL_EDGE_FLIST: ./
-TEST_EDGE_FLIST: ./
+# Edge detection paths - customize these for your setup
+TRAIN_EDGE_FLIST: ./datasets/edges/train
+VAL_EDGE_FLIST: ./datasets/edges/val
+TEST_EDGE_FLIST: ./datasets/edges/test
 
-TRAIN_MASK_FLIST: DATASET/train_mask
-VAL_MASK_FLIST: DATASET/val_mask
-TEST_MASK_FLIST: DATASET/test_mask
+# Mask paths - customize these for your setup
+TRAIN_MASK_FLIST: ./datasets/masks/train
+VAL_MASK_FLIST: ./datasets/masks/val
+TEST_MASK_FLIST: ./datasets/masks/test
 
 LR: 0.0001                    # learning rate
 D2G_LR: 0.1                   # discriminator/generator learning rate ratio
