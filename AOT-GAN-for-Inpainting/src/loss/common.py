@@ -69,7 +69,9 @@ def gaussian(window_size, sigma):
     def gauss_fcn(x):
         return -((x - window_size // 2) ** 2) / float(2 * sigma**2)
 
-    gauss = torch.stack([torch.exp(torch.tensor(gauss_fcn(x))) for x in range(window_size)])
+    gauss = torch.stack(
+        [torch.exp(torch.tensor(gauss_fcn(x))) for x in range(window_size)]
+    )
     return gauss / gauss.sum()
 
 
@@ -90,7 +92,9 @@ def get_gaussian_kernel(kernel_size: int, sigma: float) -> torch.Tensor:
       tensor([0.1201, 0.2339, 0.2921, 0.2339, 0.1201])
     """
     if not isinstance(kernel_size, int) or kernel_size % 2 == 0 or kernel_size <= 0:
-        raise TypeError("kernel_size must be an odd positive integer. Got {}".format(kernel_size))
+        raise TypeError(
+            "kernel_size must be an odd positive integer. Got {}".format(kernel_size)
+        )
     window_1d: torch.Tensor = gaussian(kernel_size, sigma)
     return window_1d
 
@@ -120,14 +124,18 @@ def get_gaussian_kernel2d(kernel_size, sigma):
               [0.0370, 0.0720, 0.0899, 0.0720, 0.0370]])
     """
     if not isinstance(kernel_size, tuple) or len(kernel_size) != 2:
-        raise TypeError("kernel_size must be a tuple of length two. Got {}".format(kernel_size))
+        raise TypeError(
+            "kernel_size must be a tuple of length two. Got {}".format(kernel_size)
+        )
     if not isinstance(sigma, tuple) or len(sigma) != 2:
         raise TypeError("sigma must be a tuple of length two. Got {}".format(sigma))
     ksize_x, ksize_y = kernel_size
     sigma_x, sigma_y = sigma
     kernel_x: torch.Tensor = get_gaussian_kernel(ksize_x, sigma_x)
     kernel_y: torch.Tensor = get_gaussian_kernel(ksize_y, sigma_y)
-    kernel_2d: torch.Tensor = torch.matmul(kernel_x.unsqueeze(-1), kernel_y.unsqueeze(-1).t())
+    kernel_2d: torch.Tensor = torch.matmul(
+        kernel_x.unsqueeze(-1), kernel_y.unsqueeze(-1).t()
+    )
     return kernel_2d
 
 
@@ -165,9 +173,13 @@ class GaussianBlur(nn.Module):
 
     def forward(self, x):  # type: ignore
         if not torch.is_tensor(x):
-            raise TypeError("Input x type is not a torch.Tensor. Got {}".format(type(x)))
+            raise TypeError(
+                "Input x type is not a torch.Tensor. Got {}".format(type(x))
+            )
         if not len(x.shape) == 4:
-            raise ValueError("Invalid input shape, we expect BxCxHxW. Got: {}".format(x.shape))
+            raise ValueError(
+                "Invalid input shape, we expect BxCxHxW. Got: {}".format(x.shape)
+            )
         # prepare kernel
         b, c, h, w = x.shape
         tmp_kernel: torch.Tensor = self.kernel.to(x.device).to(x.dtype)

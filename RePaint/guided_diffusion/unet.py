@@ -48,7 +48,7 @@ class AttentionPool2d(nn.Module):
     ):
         super().__init__()
         self.positional_embedding = nn.Parameter(
-            th.randn(embed_dim, spacial_dim ** 2 + 1) / embed_dim ** 0.5
+            th.randn(embed_dim, spacial_dim**2 + 1) / embed_dim**0.5
         )
         self.qkv_proj = conv_nd(1, embed_dim, 3 * embed_dim, 1)
         self.c_proj = conv_nd(1, embed_dim, output_dim or embed_dim, 1)
@@ -110,8 +110,7 @@ class Upsample(nn.Module):
         self.use_conv = use_conv
         self.dims = dims
         if use_conv:
-            self.conv = conv_nd(dims, self.channels,
-                                self.out_channels, 3, padding=1)
+            self.conv = conv_nd(dims, self.channels, self.out_channels, 3, padding=1)
 
     def forward(self, x):
         assert x.shape[1] == self.channels
@@ -224,8 +223,7 @@ class ResBlock(TimestepBlock):
             nn.SiLU(),
             nn.Dropout(p=dropout),
             zero_module(
-                conv_nd(dims, self.out_channels,
-                        self.out_channels, 3, padding=1)
+                conv_nd(dims, self.out_channels, self.out_channels, 3, padding=1)
             ),
         )
 
@@ -236,8 +234,7 @@ class ResBlock(TimestepBlock):
                 dims, channels, self.out_channels, 3, padding=1
             )
         else:
-            self.skip_connection = conv_nd(
-                dims, channels, self.out_channels, 1)
+            self.skip_connection = conv_nd(dims, channels, self.out_channels, 1)
 
     def forward(self, x, emb):
         """
@@ -348,8 +345,7 @@ class QKVAttentionLegacy(nn.Module):
         bs, width, length = qkv.shape
         assert width % (3 * self.n_heads) == 0
         ch = width // (3 * self.n_heads)
-        q, k, v = qkv.reshape(bs * self.n_heads, ch * 3,
-                              length).split(ch, dim=1)
+        q, k, v = qkv.reshape(bs * self.n_heads, ch * 3, length).split(ch, dim=1)
         scale = 1 / math.sqrt(math.sqrt(ch))
         weight = th.einsum(
             "bct,bcs->bts", q * scale, k * scale
@@ -390,8 +386,7 @@ class QKVAttention(nn.Module):
             (k * scale).view(bs * self.n_heads, ch, length),
         )  # More stable with f16 than dividing afterwards
         weight = th.softmax(weight.float(), dim=-1).type(weight.dtype)
-        a = th.einsum("bts,bcs->bct", weight,
-                      v.reshape(bs * self.n_heads, ch, length))
+        a = th.einsum("bts,bcs->bct", weight, v.reshape(bs * self.n_heads, ch, length))
         return a.reshape(bs, -1, length)
 
     @staticmethod
@@ -451,7 +446,7 @@ class UNetModel(nn.Module):
         use_scale_shift_norm=False,
         resblock_updown=False,
         use_new_attention_order=False,
-        conf=None
+        conf=None,
     ):
         super().__init__()
 
@@ -487,8 +482,7 @@ class UNetModel(nn.Module):
 
         ch = input_ch = int(channel_mult[0] * model_channels)
         self.input_blocks = nn.ModuleList(
-            [TimestepEmbedSequential(
-                conv_nd(dims, in_channels, ch, 3, padding=1))]
+            [TimestepEmbedSequential(conv_nd(dims, in_channels, ch, 3, padding=1))]
         )
         self._feature_size = ch
         input_block_chans = [ch]
@@ -651,16 +645,17 @@ class UNetModel(nn.Module):
         """
 
         if timesteps[0].item() > self.conf.diffusion_steps:
-            raise RuntimeError("timesteps larger than diffusion steps.",
-                               timesteps[0].item(), self.conf.diffusion_steps)
+            raise RuntimeError(
+                "timesteps larger than diffusion steps.",
+                timesteps[0].item(),
+                self.conf.diffusion_steps,
+            )
 
         if self.conf.use_value_logger:
-            self.conf.value_logger.add_to_list(
-                'model_time', timesteps[0].item())
+            self.conf.value_logger.add_to_list("model_time", timesteps[0].item())
 
         hs = []
-        emb = self.time_embed(timestep_embedding(
-            timesteps, self.model_channels))
+        emb = self.time_embed(timestep_embedding(timesteps, self.model_channels))
 
         if self.num_classes is not None:
             assert y.shape == (x.shape[0],)
@@ -690,8 +685,7 @@ class SuperResModel(UNetModel):
 
     def forward(self, x, timesteps, low_res=None, **kwargs):
         _, _, new_height, new_width = x.shape
-        upsampled = F.interpolate(
-            low_res, (new_height, new_width), mode="bilinear")
+        upsampled = F.interpolate(low_res, (new_height, new_width), mode="bilinear")
         x = th.cat([x, upsampled], dim=1)
         return super().forward(x, timesteps, **kwargs)
 
@@ -753,8 +747,7 @@ class EncoderUNetModel(nn.Module):
 
         ch = int(channel_mult[0] * model_channels)
         self.input_blocks = nn.ModuleList(
-            [TimestepEmbedSequential(
-                conv_nd(dims, in_channels, ch, 3, padding=1))]
+            [TimestepEmbedSequential(conv_nd(dims, in_channels, ch, 3, padding=1))]
         )
         self._feature_size = ch
         input_block_chans = [ch]
@@ -893,8 +886,7 @@ class EncoderUNetModel(nn.Module):
         :param timesteps: a 1-D batch of timesteps.
         :return: an [N x K] Tensor of outputs.
         """
-        emb = self.time_embed(timestep_embedding(
-            timesteps, self.model_channels))
+        emb = self.time_embed(timestep_embedding(timesteps, self.model_channels))
 
         results = []
         h = x.type(self.dtype)

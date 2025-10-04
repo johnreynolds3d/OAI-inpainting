@@ -31,7 +31,8 @@ from guided_diffusion import dist_util
 # Workaround
 try:
     import ctypes
-    libgcc_s = ctypes.CDLL('libgcc_s.so.1')
+
+    libgcc_s = ctypes.CDLL("libgcc_s.so.1")
 except:
     pass
 
@@ -44,6 +45,7 @@ from guided_diffusion.script_util import (
     create_classifier,
     select_args,
 )  # noqa: E402
+
 
 def toU8(sample):
     if sample is None:
@@ -58,17 +60,17 @@ def toU8(sample):
 
 def main(conf: conf_mgt.Default_Conf):
 
-    print("Start", conf['name'])
+    print("Start", conf["name"])
 
-    device = dist_util.dev(conf.get('device'))
-
+    device = dist_util.dev(conf.get("device"))
 
     model, diffusion = create_model_and_diffusion(
         **select_args(conf, model_and_diffusion_defaults().keys()), conf=conf
     )
     model.load_state_dict(
-        dist_util.load_state_dict(os.path.expanduser(
-            conf.model_path), map_location="cpu")
+        dist_util.load_state_dict(
+            os.path.expanduser(conf.model_path), map_location="cpu"
+        )
     )
     model.to(device)
     if conf.use_fp16:
@@ -80,10 +82,12 @@ def main(conf: conf_mgt.Default_Conf):
     if conf.classifier_scale > 0 and conf.classifier_path:
         print("loading classifier...")
         classifier = create_classifier(
-            **select_args(conf, classifier_defaults().keys()))
+            **select_args(conf, classifier_defaults().keys())
+        )
         classifier.load_state_dict(
-            dist_util.load_state_dict(os.path.expanduser(
-                conf.classifier_path), map_location="cpu")
+            dist_util.load_state_dict(
+                os.path.expanduser(conf.classifier_path), map_location="cpu"
+            )
         )
 
         classifier.to(device)
@@ -99,6 +103,7 @@ def main(conf: conf_mgt.Default_Conf):
                 log_probs = F.log_softmax(logits, dim=-1)
                 selected = log_probs[range(len(logits)), y.view(-1)]
                 return th.autograd.grad(selected.sum(), x_in)[0] * conf.classifier_scale
+
     else:
         cond_fn = None
 
@@ -109,7 +114,7 @@ def main(conf: conf_mgt.Default_Conf):
     print("sampling...")
     all_images = []
 
-    dset = 'eval'
+    dset = "eval"
 
     eval_name = conf.get_default_eval_name()
 
@@ -123,11 +128,11 @@ def main(conf: conf_mgt.Default_Conf):
 
         model_kwargs = {}
 
-        model_kwargs["gt"] = batch['GT']
+        model_kwargs["gt"] = batch["GT"]
 
-        gt_keep_mask = batch.get('gt_keep_mask')
+        gt_keep_mask = batch.get("gt_keep_mask")
         if gt_keep_mask is not None:
-            model_kwargs['gt_keep_mask'] = gt_keep_mask
+            model_kwargs["gt_keep_mask"] = gt_keep_mask
 
         batch_size = model_kwargs["gt"].shape[0]
 
@@ -144,7 +149,6 @@ def main(conf: conf_mgt.Default_Conf):
             diffusion.p_sample_loop if not conf.use_ddim else diffusion.ddim_sample_loop
         )
 
-
         result = sample_fn(
             model_fn,
             (batch_size, 3, conf.image_size, conf.image_size),
@@ -154,27 +158,38 @@ def main(conf: conf_mgt.Default_Conf):
             device=device,
             progress=show_progress,
             return_all=True,
-            conf=conf
+            conf=conf,
         )
-        srs = toU8(result['sample'])
-        gts = toU8(result['gt'])
-        lrs = toU8(result.get('gt') * model_kwargs.get('gt_keep_mask') + (-1) *
-                   th.ones_like(result.get('gt')) * (1 - model_kwargs.get('gt_keep_mask')))
+        srs = toU8(result["sample"])
+        gts = toU8(result["gt"])
+        lrs = toU8(
+            result.get("gt") * model_kwargs.get("gt_keep_mask")
+            + (-1)
+            * th.ones_like(result.get("gt"))
+            * (1 - model_kwargs.get("gt_keep_mask"))
+        )
 
-        gt_keep_masks = toU8((model_kwargs.get('gt_keep_mask') * 2 - 1))
+        gt_keep_masks = toU8((model_kwargs.get("gt_keep_mask") * 2 - 1))
 
         conf.eval_imswrite(
-            srs=srs, gts=gts, lrs=lrs, gt_keep_masks=gt_keep_masks,
-            img_names=batch['GT_name'], dset=dset, name=eval_name, verify_same=False)
+            srs=srs,
+            gts=gts,
+            lrs=lrs,
+            gt_keep_masks=gt_keep_masks,
+            img_names=batch["GT_name"],
+            dset=dset,
+            name=eval_name,
+            verify_same=False,
+        )
 
     print("sampling complete")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--conf_path', type=str, required=False, default=None)
+    parser.add_argument("--conf_path", type=str, required=False, default=None)
     args = vars(parser.parse_args())
 
     conf_arg = conf_mgt.conf_base.Default_Conf()
-    conf_arg.update(yamlread(args.get('conf_path')))
+    conf_arg.update(yamlread(args.get("conf_path")))
     main(conf_arg)

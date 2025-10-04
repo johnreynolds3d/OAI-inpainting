@@ -44,7 +44,7 @@ def space_timesteps(num_timesteps, section_counts):
     """
     if isinstance(section_counts, str):
         if section_counts.startswith("ddim"):
-            desired_count = int(section_counts[len("ddim"):])
+            desired_count = int(section_counts[len("ddim") :])
             for i in range(1, num_timesteps):
                 if len(range(0, num_timesteps, i)) == desired_count:
                     return set(range(0, num_timesteps, i))
@@ -93,12 +93,12 @@ class SpacedDiffusion(GaussianDiffusion):
         self.original_num_steps = len(kwargs["betas"])
         self.conf = conf
 
-        base_diffusion = GaussianDiffusion(conf=conf,
-                                           **kwargs)  # pylint: disable=missing-kwoa
+        base_diffusion = GaussianDiffusion(
+            conf=conf, **kwargs
+        )  # pylint: disable=missing-kwoa
 
         if conf.respace_interpolate:
-            new_betas = resample_betas(
-                kwargs["betas"], int(conf.timestep_respacing))
+            new_betas = resample_betas(kwargs["betas"], int(conf.timestep_respacing))
             self.timestep_map = list(range(len(new_betas)))
         else:
             self.timestep_map = []
@@ -113,8 +113,7 @@ class SpacedDiffusion(GaussianDiffusion):
         kwargs["betas"] = np.array(new_betas)
 
         if conf.use_value_logger:
-            conf.value_logger.add_value(
-                new_betas, 'new_betas SpacedDiffusion')
+            conf.value_logger.add_value(new_betas, "new_betas SpacedDiffusion")
 
         super().__init__(conf=conf, **kwargs)
 
@@ -138,8 +137,11 @@ class SpacedDiffusion(GaussianDiffusion):
         if isinstance(model, _WrappedModel):
             return model
         return _WrappedModel(
-            model, self.timestep_map, self.rescale_timesteps,
-            self.original_num_steps, self.conf
+            model,
+            self.timestep_map,
+            self.rescale_timesteps,
+            self.original_num_steps,
+            self.conf,
         )
 
     def _scale_timesteps(self, t):
@@ -148,7 +150,9 @@ class SpacedDiffusion(GaussianDiffusion):
 
 
 class _WrappedModel:
-    def __init__(self, model, timestep_map, rescale_timesteps, original_num_steps, conf):
+    def __init__(
+        self, model, timestep_map, rescale_timesteps, original_num_steps, conf
+    ):
         self.model = model
         self.timestep_map = timestep_map
         self.rescale_timesteps = rescale_timesteps
@@ -157,15 +161,18 @@ class _WrappedModel:
 
     def __call__(self, x, ts, **kwargs):
         map_tensor = th.tensor(  # pylint: disable=not-callable
-            self.timestep_map, device=ts.device, dtype=ts.dtype)
+            self.timestep_map, device=ts.device, dtype=ts.dtype
+        )
         new_ts = map_tensor[ts]
         if self.rescale_timesteps:
             raise NotImplementedError()
-            #new_ts = self.do_rescale_timesteps(new_ts)
+            # new_ts = self.do_rescale_timesteps(new_ts)
 
         if self.conf.respace_interpolate:
             new_ts = new_ts.float() * (
-                (self.conf.diffusion_steps - 1) / (float(self.conf.timestep_respacing) - 1.0))
+                (self.conf.diffusion_steps - 1)
+                / (float(self.conf.timestep_respacing) - 1.0)
+            )
 
         return self.model(x, new_ts, **kwargs)
 

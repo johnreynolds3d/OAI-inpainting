@@ -111,7 +111,7 @@ def create_model_and_diffusion(
     resblock_updown,
     use_fp16,
     use_new_attention_order,
-    conf=None
+    conf=None,
 ):
     model = create_model(
         image_size,
@@ -130,7 +130,7 @@ def create_model_and_diffusion(
         resblock_updown=resblock_updown,
         use_fp16=use_fp16,
         use_new_attention_order=use_new_attention_order,
-        conf=conf
+        conf=conf,
     )
     diffusion = create_gaussian_diffusion(
         steps=diffusion_steps,
@@ -141,7 +141,7 @@ def create_model_and_diffusion(
         rescale_timesteps=rescale_timesteps,
         rescale_learned_sigmas=rescale_learned_sigmas,
         timestep_respacing=timestep_respacing,
-        conf=conf
+        conf=conf,
     )
     return model, diffusion
 
@@ -164,7 +164,7 @@ def create_model(
     use_fp16=False,
     use_new_attention_order=False,
     image_size_inference=None,
-    conf=None
+    conf=None,
 ):
     if channel_mult == "":
         if image_size == 512:
@@ -180,8 +180,7 @@ def create_model(
     elif isinstance(channel_mult, tuple):
         pass
     else:
-        channel_mult = tuple(int(ch_mult)
-                             for ch_mult in channel_mult.split(","))
+        channel_mult = tuple(int(ch_mult) for ch_mult in channel_mult.split(","))
 
     attention_ds = []
     for res in attention_resolutions.split(","):
@@ -207,7 +206,7 @@ def create_model(
         use_scale_shift_norm=use_scale_shift_norm,
         resblock_updown=resblock_updown,
         use_new_attention_order=use_new_attention_order,
-        conf=conf
+        conf=conf,
     )
 
 
@@ -220,7 +219,7 @@ def create_classifier(
     classifier_use_scale_shift_norm,
     classifier_resblock_updown,
     classifier_pool,
-    image_size_inference=None
+    image_size_inference=None,
 ):
     if image_size == 512:
         channel_mult = (0.5, 1, 1, 2, 2, 4, 4)
@@ -266,14 +265,13 @@ def create_gaussian_diffusion(
     rescale_timesteps=False,
     rescale_learned_sigmas=False,
     timestep_respacing="",
-    conf=None
+    conf=None,
 ):
 
     betas = gd.get_named_beta_schedule(noise_schedule, steps, use_scale=True)
 
     if conf.use_value_logger:
-        conf.value_logger.add_value(
-            betas, 'betas create_gaussian_diffusion')
+        conf.value_logger.add_value(betas, "betas create_gaussian_diffusion")
 
     if use_kl:
         loss_type = gd.LossType.RESCALED_KL
@@ -302,8 +300,9 @@ def create_gaussian_diffusion(
         ),
         loss_type=loss_type,
         rescale_timesteps=rescale_timesteps,
-        conf=conf
+        conf=conf,
     )
+
 
 def select_args(args_dict, keys):
     return {k: args_dict[k] for k in keys}

@@ -39,5 +39,3 @@ def load_state_dict(path, backend=None, **kwargs):
     with bf.BlobFile(path, "rb") as f:
         data = f.read()
     return th.load(io.BytesIO(data), **kwargs)
-
-

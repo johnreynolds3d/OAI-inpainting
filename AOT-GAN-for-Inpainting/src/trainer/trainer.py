@@ -22,22 +22,32 @@ class Trainer:
         self.dataloader = create_loader(args)
 
         # set up losses and metrics
-        self.rec_loss_func = {key: getattr(loss_module, key)() for key, val in args.rec_loss.items()}
+        self.rec_loss_func = {
+            key: getattr(loss_module, key)() for key, val in args.rec_loss.items()
+        }
         self.adv_loss = getattr(loss_module, args.gan_type)()
 
         # Image generator input: [rgb(3) + mask(1)], discriminator input: [rgb(3)]
         net = importlib.import_module("model." + args.model)
 
         self.netG = net.InpaintGenerator(args).cuda()
-        self.optimG = torch.optim.Adam(self.netG.parameters(), lr=args.lrg, betas=(args.beta1, args.beta2))
+        self.optimG = torch.optim.Adam(
+            self.netG.parameters(), lr=args.lrg, betas=(args.beta1, args.beta2)
+        )
 
         self.netD = net.Discriminator().cuda()
-        self.optimD = torch.optim.Adam(self.netD.parameters(), lr=args.lrd, betas=(args.beta1, args.beta2))
+        self.optimD = torch.optim.Adam(
+            self.netD.parameters(), lr=args.lrd, betas=(args.beta1, args.beta2)
+        )
 
         self.load()
         if args.distributed:
-            self.netG = DDP(self.netG, device_ids=[args.local_rank], output_device=[args.local_rank])
-            self.netD = DDP(self.netD, device_ids=[args.local_rank], output_device=[args.local_rank])
+            self.netG = DDP(
+                self.netG, device_ids=[args.local_rank], output_device=[args.local_rank]
+            )
+            self.netD = DDP(
+                self.netD, device_ids=[args.local_rank], output_device=[args.local_rank]
+            )
 
         if args.tensorboard:
             self.writer = SummaryWriter(os.path.join(args.save_dir, "log"))
@@ -76,20 +86,30 @@ class Trainer:
         if self.args.global_rank == 0:
             print(f"\nsaving {self.iteration} model to {self.args.save_dir} ...")
             torch.save(
-                self.netG.module.state_dict(), os.path.join(self.args.save_dir, f"G{str(self.iteration).zfill(7)}.pt")
+                self.netG.module.state_dict(),
+                os.path.join(self.args.save_dir, f"G{str(self.iteration).zfill(7)}.pt"),
             )
             torch.save(
-                self.netD.module.state_dict(), os.path.join(self.args.save_dir, f"D{str(self.iteration).zfill(7)}.pt")
+                self.netD.module.state_dict(),
+                os.path.join(self.args.save_dir, f"D{str(self.iteration).zfill(7)}.pt"),
             )
             torch.save(
-                {"optimG": self.optimG.state_dict(), "optimD": self.optimD.state_dict()},
+                {
+                    "optimG": self.optimG.state_dict(),
+                    "optimD": self.optimD.state_dict(),
+                },
                 os.path.join(self.args.save_dir, f"O{str(self.iteration).zfill(7)}.pt"),
             )
 
     def train(self):
         pbar = range(self.iteration, self.args.iterations)
         if self.args.global_rank == 0:
-            pbar = tqdm(range(self.args.iterations), initial=self.iteration, dynamic_ncols=True, smoothing=0.01)
+            pbar = tqdm(
+                range(self.args.iterations),
+                initial=self.iteration,
+                dynamic_ncols=True,
+                smoothing=0.01,
+            )
             timer_data, timer_model = timer(), timer()
 
         for idx in pbar:
@@ -130,9 +150,13 @@ class Trainer:
 
             # logs
             # scalar_reduced = reduce_loss_dict(losses, self.args.world_size)
-            if self.args.global_rank == 0 and (self.iteration % self.args.print_every == 0):
+            if self.args.global_rank == 0 and (
+                self.iteration % self.args.print_every == 0
+            ):
                 pbar.update(self.args.print_every)
-                description = f"mt:{timer_model.release():.1f}s, dt:{timer_data.release():.1f}s, "
+                description = (
+                    f"mt:{timer_model.release():.1f}s, dt:{timer_data.release():.1f}s, "
+                )
                 for key, val in losses.items():
                     description += f"{key}:{val.item():.3f}, "
                     if self.args.tensorboard:
@@ -140,9 +164,18 @@ class Trainer:
                 pbar.set_description((description))
                 if self.args.tensorboard:
                     self.writer.add_image("mask", make_grid(masks), self.iteration)
-                    self.writer.add_image("orig", make_grid((images + 1.0) / 2.0), self.iteration)
-                    self.writer.add_image("pred", make_grid((pred_img + 1.0) / 2.0), self.iteration)
-                    self.writer.add_image("comp", make_grid((comp_img + 1.0) / 2.0), self.iteration)
+                    self.writer.add_image(
+                        "orig", make_grid((images + 1.0) / 2.0), self.iteration
+                    )
+                    self.writer.add_image(
+                        "pred", make_grid((pred_img + 1.0) / 2.0), self.iteration
+                    )
+                    self.writer.add_image(
+                        "comp", make_grid((comp_img + 1.0) / 2.0), self.iteration
+                    )
 
-            if self.args.global_rank == 0 and (self.iteration % self.args.save_every) == 0:
+            if (
+                self.args.global_rank == 0
+                and (self.iteration % self.args.save_every) == 0
+            ):
                 self.save()

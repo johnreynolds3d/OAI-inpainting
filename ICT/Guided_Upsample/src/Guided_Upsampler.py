@@ -3,19 +3,20 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from .dataset_my import Dataset
-from .models import  InpaintingModel
+from .models import InpaintingModel
 from .utils import Progbar, create_dir, stitch_images, imsave
 from .metrics import PSNR
 import torchvision.utils as vutils
 
-class Guided_Upsampler():
+
+class Guided_Upsampler:
     def __init__(self, config):
         self.config = config
 
         if config.MODEL == 1:
-            model_name = 'edge'
+            model_name = "edge"
         elif config.MODEL == 2:
-            model_name = 'inpaint'
+            model_name = "inpaint"
 
         self.debug = False
         self.model_name = model_name
@@ -26,14 +27,35 @@ class Guided_Upsampler():
 
         # test mode
         if self.config.MODE == 2:
-            self.test_dataset = Dataset(config, config.TEST_FLIST, config.TEST_EDGE_FLIST, config.TEST_MASK_FLIST, augment=False, training=False)
+            self.test_dataset = Dataset(
+                config,
+                config.TEST_FLIST,
+                config.TEST_EDGE_FLIST,
+                config.TEST_MASK_FLIST,
+                augment=False,
+                training=False,
+            )
         else:
-            self.train_dataset = Dataset(config, config.TRAIN_FLIST, config.TRAIN_EDGE_FLIST, config.TRAIN_MASK_FLIST, augment=True, training=True)
-            self.val_dataset = Dataset(config, config.VAL_FLIST, config.VAL_EDGE_FLIST, config.VAL_MASK_FLIST, augment=False, training=True)
+            self.train_dataset = Dataset(
+                config,
+                config.TRAIN_FLIST,
+                config.TRAIN_EDGE_FLIST,
+                config.TRAIN_MASK_FLIST,
+                augment=True,
+                training=True,
+            )
+            self.val_dataset = Dataset(
+                config,
+                config.VAL_FLIST,
+                config.VAL_EDGE_FLIST,
+                config.VAL_MASK_FLIST,
+                augment=False,
+                training=True,
+            )
             self.sample_iterator = self.val_dataset.create_iterator(config.SAMPLE_SIZE)
 
-        self.samples_path = os.path.join(config.PATH, 'samples')
-        self.results_path = os.path.join(config.PATH, 'results')
+        self.samples_path = os.path.join(config.PATH, "samples")
+        self.results_path = os.path.join(config.PATH, "results")
 
         if config.RESULTS is not None:
             self.results_path = os.path.join(config.RESULTS)
@@ -41,12 +63,12 @@ class Guided_Upsampler():
         if config.DEBUG is not None and config.DEBUG != 0:
             self.debug = True
 
-        self.log_file = os.path.join(config.PATH, 'log_' + model_name + '.dat')
+        self.log_file = os.path.join(config.PATH, "log_" + model_name + ".dat")
 
     def load(self):
 
         self.inpaint_model.load()
-        
+
     def save(self):
 
         self.inpaint_model.save()
@@ -57,7 +79,7 @@ class Guided_Upsampler():
             batch_size=self.config.BATCH_SIZE,
             num_workers=4,
             drop_last=True,
-            shuffle=True
+            shuffle=True,
         )
 
         epoch = 0
@@ -67,17 +89,19 @@ class Guided_Upsampler():
         total = len(self.train_dataset)
 
         if total == 0:
-            print('No training data was provided! Check \'TRAIN_FLIST\' value in the configuration file.')
+            print(
+                "No training data was provided! Check 'TRAIN_FLIST' value in the configuration file."
+            )
             return
 
-        while(keep_training):
+        while keep_training:
             epoch += 1
-            print('\n\nTraining epoch: %d' % epoch)
+            print("\n\nTraining epoch: %d" % epoch)
 
             if self.config.No_Bar:
                 pass
             else:
-                progbar = Progbar(total, width=20, stateful_metrics=['epoch', 'iter'])
+                progbar = Progbar(total, width=20, stateful_metrics=["epoch", "iter"])
 
             for items in train_loader:
                 self.inpaint_model.train()
@@ -90,21 +114,25 @@ class Guided_Upsampler():
 
                 if model == 2:
                     # train
-                    outputs, gen_loss, dis_loss, logs = self.inpaint_model.process(images, edges, masks)
+                    outputs, gen_loss, dis_loss, logs = self.inpaint_model.process(
+                        images, edges, masks
+                    )
                     outputs_merged = (outputs * masks) + (images * (1 - masks))
 
                     # metrics
-                    psnr = self.psnr(self.postprocess(images), self.postprocess(outputs_merged))
-                    mae = (torch.sum(torch.abs(images - outputs_merged)) / torch.sum(images)).float()
-                    logs.append(('psnr', psnr.item()))
-                    logs.append(('mae', mae.item()))
+                    psnr = self.psnr(
+                        self.postprocess(images), self.postprocess(outputs_merged)
+                    )
+                    mae = (
+                        torch.sum(torch.abs(images - outputs_merged))
+                        / torch.sum(images)
+                    ).float()
+                    logs.append(("psnr", psnr.item()))
+                    logs.append(("mae", mae.item()))
 
                     # backward
                     # self.inpaint_model.backward(gen_loss, dis_loss)
                     iteration = self.inpaint_model.iteration
-
-
-
 
                 if iteration >= max_iteration:
                     keep_training = False
@@ -118,33 +146,52 @@ class Guided_Upsampler():
                 if self.config.No_Bar:
                     pass
                 else:
-                    progbar.add(len(images), values=logs if self.config.VERBOSE else [x for x in logs if not x[0].startswith('l_')])
+                    progbar.add(
+                        len(images),
+                        values=(
+                            logs
+                            if self.config.VERBOSE
+                            else [x for x in logs if not x[0].startswith("l_")]
+                        ),
+                    )
 
                 # log model at checkpoints
-                if self.config.LOG_INTERVAL and iteration % self.config.LOG_INTERVAL == 0:
+                if (
+                    self.config.LOG_INTERVAL
+                    and iteration % self.config.LOG_INTERVAL == 0
+                ):
                     self.log(logs)
 
                 # sample model at checkpoints
-                if self.config.SAMPLE_INTERVAL and iteration % self.config.SAMPLE_INTERVAL == 0:
+                if (
+                    self.config.SAMPLE_INTERVAL
+                    and iteration % self.config.SAMPLE_INTERVAL == 0
+                ):
                     self.sample()
 
                 # evaluate model at checkpoints
-                if self.config.EVAL_INTERVAL and iteration % self.config.EVAL_INTERVAL == 0:
-                    print('\nstart eval...\n')
+                if (
+                    self.config.EVAL_INTERVAL
+                    and iteration % self.config.EVAL_INTERVAL == 0
+                ):
+                    print("\nstart eval...\n")
                     self.eval()
 
                 # save model at checkpoints
-                if self.config.SAVE_INTERVAL and iteration % self.config.SAVE_INTERVAL == 0:
+                if (
+                    self.config.SAVE_INTERVAL
+                    and iteration % self.config.SAVE_INTERVAL == 0
+                ):
                     self.save()
 
-        print('\nEnd training....')
+        print("\nEnd training....")
 
     def eval(self):
         val_loader = DataLoader(
             dataset=self.val_dataset,
             batch_size=self.config.BATCH_SIZE,
             drop_last=True,
-            shuffle=False
+            shuffle=False,
         )
 
         model = self.config.MODEL
@@ -155,29 +202,34 @@ class Guided_Upsampler():
         if self.config.No_Bar:
             pass
         else:
-            progbar = Progbar(total, width=20, stateful_metrics=['it'])
+            progbar = Progbar(total, width=20, stateful_metrics=["it"])
         iteration = 0
 
         for items in val_loader:
             iteration += 1
             images, edges, masks = self.cuda(*items)
 
-
-
             # inpaint model
             if model == 2:
                 # eval
-                outputs, gen_loss, dis_loss, logs = self.inpaint_model.process(images, edges, masks)
+                outputs, gen_loss, dis_loss, logs = self.inpaint_model.process(
+                    images, edges, masks
+                )
                 outputs_merged = (outputs * masks) + (images * (1 - masks))
 
                 # metrics
-                psnr = self.psnr(self.postprocess(images), self.postprocess(outputs_merged))
-                mae = (torch.sum(torch.abs(images - outputs_merged)) / torch.sum(images)).float()
-                logs.append(('psnr', psnr.item()))
-                logs.append(('mae', mae.item()))
+                psnr = self.psnr(
+                    self.postprocess(images), self.postprocess(outputs_merged)
+                )
+                mae = (
+                    torch.sum(torch.abs(images - outputs_merged)) / torch.sum(images)
+                ).float()
+                logs.append(("psnr", psnr.item()))
+                logs.append(("mae", mae.item()))
 
-
-            logs = [("it", iteration), ] + logs
+            logs = [
+                ("it", iteration),
+            ] + logs
             if self.config.No_Bar:
                 pass
             else:
@@ -199,13 +251,16 @@ class Guided_Upsampler():
         for items in test_loader:
 
             name = self.test_dataset.load_name(index)
-            
+
             print(name)
-            
+
             if self.config.same_face:
                 path = os.path.join(self.results_path, name)
             else:
-                path = os.path.join(self.results_path, name[:-4]+"_%d"%(index%self.config.condition_num)+'.png')
+                path = os.path.join(
+                    self.results_path,
+                    name[:-4] + "_%d" % (index % self.config.condition_num) + ".png",
+                )
 
             images, edges, masks = self.cuda(*items)
             index += self.config.test_batch_size
@@ -219,9 +274,15 @@ class Guided_Upsampler():
                     outputs_merged = outputs
 
             if self.config.same_face:
-                all_tensor=[images,edges,images * (1 - masks),outputs_merged]
-                all_tensor=torch.cat(all_tensor,dim=0)
-                vutils.save_image(all_tensor,path,nrow=self.config.test_batch_size,padding=0,normalize=False)
+                all_tensor = [images, edges, images * (1 - masks), outputs_merged]
+                all_tensor = torch.cat(all_tensor, dim=0)
+                vutils.save_image(
+                    all_tensor,
+                    path,
+                    nrow=self.config.test_batch_size,
+                    padding=0,
+                    normalize=False,
+                )
                 print(index, name)
             else:
                 output = self.postprocess(outputs_merged)[0]
@@ -231,12 +292,14 @@ class Guided_Upsampler():
             if self.debug:
                 edges = self.postprocess(1 - edges)[0]
                 masked = self.postprocess(images * (1 - masks) + masks)[0]
-                fname, fext = name.split('.')
+                fname, fext = name.split(".")
 
-                imsave(edges, os.path.join(self.results_path, fname + '_edge.' + fext))
-                imsave(masked, os.path.join(self.results_path, fname + '_masked.' + fext))
+                imsave(edges, os.path.join(self.results_path, fname + "_edge." + fext))
+                imsave(
+                    masked, os.path.join(self.results_path, fname + "_masked." + fext)
+                )
 
-        print('\nEnd test....')
+        print("\nEnd test....")
 
     def sample(self, it=None):
         # do not sample when validation set is empty
@@ -248,7 +311,6 @@ class Guided_Upsampler():
         model = self.config.MODEL
         items = next(self.sample_iterator)
         images, edges, masks = self.cuda(*items)
-
 
         # inpaint model
         if model == 2:
@@ -270,19 +332,18 @@ class Guided_Upsampler():
             self.postprocess(edges),
             self.postprocess(outputs),
             self.postprocess(outputs_merged),
-            img_per_row = image_per_row
+            img_per_row=image_per_row,
         )
-
 
         path = os.path.join(self.samples_path, self.model_name)
         name = os.path.join(path, str(iteration).zfill(5) + ".png")
         create_dir(path)
-        print('\nsaving sample ' + name)
+        print("\nsaving sample " + name)
         images.save(name)
 
     def log(self, logs):
-        with open(self.log_file, 'a') as f:
-            f.write('%s\n' % ' '.join([str(item[1]) for item in logs]))
+        with open(self.log_file, "a") as f:
+            f.write("%s\n" % " ".join([str(item[1]) for item in logs]))
 
     def cuda(self, *args):
         return (item.to(self.config.DEVICE) for item in args)
@@ -292,6 +353,3 @@ class Guided_Upsampler():
         img = img * 255.0
         img = img.permute(0, 2, 3, 1)
         return img.int()
-
-
-

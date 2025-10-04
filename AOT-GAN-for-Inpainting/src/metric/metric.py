@@ -38,7 +38,11 @@ def compare_ssim(pairs):
 def mae(reals, fakes, num_worker=8):
     error = 0
     pool = Pool(num_worker)
-    for val in tqdm(pool.imap_unordered(compare_mae, zip(reals, fakes)), total=len(reals), desc="compare_mae"):
+    for val in tqdm(
+        pool.imap_unordered(compare_mae, zip(reals, fakes)),
+        total=len(reals),
+        desc="compare_mae",
+    ):
         error += val
     return error / len(reals)
 
@@ -46,7 +50,11 @@ def mae(reals, fakes, num_worker=8):
 def psnr(reals, fakes, num_worker=8):
     error = 0
     pool = Pool(num_worker)
-    for val in tqdm(pool.imap_unordered(compare_psnr, zip(reals, fakes)), total=len(reals), desc="compare_psnr"):
+    for val in tqdm(
+        pool.imap_unordered(compare_psnr, zip(reals, fakes)),
+        total=len(reals),
+        desc="compare_psnr",
+    ):
         error += val
     return error / len(reals)
 
@@ -54,7 +62,11 @@ def psnr(reals, fakes, num_worker=8):
 def ssim(reals, fakes, num_worker=8):
     error = 0
     pool = Pool(num_worker)
-    for val in tqdm(pool.imap_unordered(compare_ssim, zip(reals, fakes)), total=len(reals), desc="compare_ssim"):
+    for val in tqdm(
+        pool.imap_unordered(compare_ssim, zip(reals, fakes)),
+        total=len(reals),
+        desc="compare_ssim",
+    ):
         error += val
     return error / len(reals)
 
@@ -86,7 +98,9 @@ def fid(reals, fakes, num_worker=8, real_fid_path=None):
     return fid_value
 
 
-def calculate_activation_statistics(images, model, batch_size=64, dims=2048, cuda=True, verbose=False):
+def calculate_activation_statistics(
+    images, model, batch_size=64, dims=2048, cuda=True, verbose=False
+):
     """Calculation of the statistics used by the FID.
     Params:
     -- images      : Numpy array of dimension (n_images, 3, hi, wi). The values
@@ -133,7 +147,12 @@ def get_activations(images, model, batch_size=64, dims=2048, cuda=True, verbose=
 
     d0 = images.shape[0]
     if batch_size > d0:
-        print(("Warning: batch size is bigger than the data size. " "Setting batch size to data size"))
+        print(
+            (
+                "Warning: batch size is bigger than the data size. "
+                "Setting batch size to data size"
+            )
+        )
         batch_size = d0
 
     n_batches = d0 // batch_size
@@ -189,14 +208,21 @@ def calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6):
     sigma1 = np.atleast_2d(sigma1)
     sigma2 = np.atleast_2d(sigma2)
 
-    assert mu1.shape == mu2.shape, "Training and test mean vectors have different lengths"
-    assert sigma1.shape == sigma2.shape, "Training and test covariances have different dimensions"
+    assert (
+        mu1.shape == mu2.shape
+    ), "Training and test mean vectors have different lengths"
+    assert (
+        sigma1.shape == sigma2.shape
+    ), "Training and test covariances have different dimensions"
     diff = mu1 - mu2
 
     # Product might be almost singular
     covmean, _ = linalg.sqrtm(sigma1.dot(sigma2), disp=False)
     if not np.isfinite(covmean).all():
-        msg = ("fid calculation produces singular product; " "adding %s to diagonal of cov estimates") % eps
+        msg = (
+            "fid calculation produces singular product; "
+            "adding %s to diagonal of cov estimates"
+        ) % eps
         print(msg)
         offset = np.eye(sigma1.shape[0]) * eps
         covmean = linalg.sqrtm((sigma1 + offset).dot(sigma2 + offset))

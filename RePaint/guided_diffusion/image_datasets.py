@@ -22,9 +22,11 @@ import blobfile as bf
 import numpy as np
 from torch.utils.data import DataLoader, Dataset
 
+
 def load_data_yield(loader):
     while True:
         yield from loader
+
 
 def load_data_inpa(
     *,
@@ -42,7 +44,7 @@ def load_data_inpa(
     drop_last=True,
     conf=None,
     offset=0,
-    ** kwargs
+    **kwargs,
 ):
     """
     For a dataset, create a generator over (images, kwargs) pairs.
@@ -87,17 +89,25 @@ def load_data_inpa(
         return_dict=return_dict,
         max_len=max_len,
         conf=conf,
-        offset=offset
+        offset=offset,
     )
 
     if deterministic:
         loader = DataLoader(
-            dataset, batch_size=batch_size, shuffle=False, num_workers=1, drop_last=drop_last
+            dataset,
+            batch_size=batch_size,
+            shuffle=False,
+            num_workers=1,
+            drop_last=drop_last,
         )
 
     else:
         loader = DataLoader(
-            dataset, batch_size=batch_size, shuffle=True, num_workers=1, drop_last=drop_last
+            dataset,
+            batch_size=batch_size,
+            shuffle=True,
+            num_workers=1,
+            drop_last=drop_last,
         )
 
     if return_dataloader:
@@ -132,7 +142,7 @@ class ImageDatasetInpa(Dataset):
         return_dict=False,
         max_len=None,
         conf=None,
-        offset=0
+        offset=0,
     ):
         super().__init__()
         self.resolution = resolution
@@ -183,9 +193,9 @@ class ImageDatasetInpa(Dataset):
         if self.return_dict:
             name = os.path.basename(gt_path)
             return {
-                'GT': np.transpose(arr_gt, [2, 0, 1]),
-                'GT_name': name,
-                'gt_keep_mask': np.transpose(arr_mask, [2, 0, 1]),
+                "GT": np.transpose(arr_gt, [2, 0, 1]),
+                "GT_name": name,
+                "gt_keep_mask": np.transpose(arr_mask, [2, 0, 1]),
             }
         else:
             raise NotImplementedError()
@@ -215,4 +225,4 @@ def center_crop_arr(pil_image, image_size):
     arr = np.array(pil_image)
     crop_y = (arr.shape[0] - image_size) // 2
     crop_x = (arr.shape[1] - image_size) // 2
-    return arr[crop_y: crop_y + image_size, crop_x: crop_x + image_size]
+    return arr[crop_y : crop_y + image_size, crop_x : crop_x + image_size]

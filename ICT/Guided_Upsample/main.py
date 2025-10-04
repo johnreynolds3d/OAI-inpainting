@@ -18,23 +18,18 @@ def main(mode=None):
 
     config = load_config(mode)
 
-
     # cuda visble devices
-    #os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(str(e) for e in config.GPU)
-
+    # os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(str(e) for e in config.GPU)
 
     # init device
     if torch.cuda.is_available():
         config.DEVICE = torch.device("cuda")
-        torch.backends.cudnn.benchmark = True   # cudnn auto-tuner
+        torch.backends.cudnn.benchmark = True  # cudnn auto-tuner
     else:
         config.DEVICE = torch.device("cpu")
 
-
-
     # set cv2 running threads to 1 (prevents deadlocks with pytorch dataloader)
     cv2.setNumThreads(0)
-
 
     # initialize random seed
     torch.manual_seed(config.SEED)
@@ -42,27 +37,24 @@ def main(mode=None):
     np.random.seed(config.SEED)
     random.seed(config.SEED)
 
-
-
     # build the model and initialize
     model = Guided_Upsampler(config)
     model.load()
 
-
     # model training
     if config.MODE == 1:
         config.print()
-        print('\nstart training...\n')
+        print("\nstart training...\n")
         model.train()
 
     # model test
     elif config.MODE == 2:
-        print('\nstart testing...\n')
+        print("\nstart testing...\n")
         model.test()
 
     # eval mode
     else:
-        print('\nstart eval...\n')
+        print("\nstart eval...\n")
         model.eval()
 
 
@@ -74,31 +66,78 @@ def load_config(mode=None):
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--path', '--checkpoints', type=str, default='./checkpoints', help='model checkpoints path (default: ./checkpoints)')
-    parser.add_argument('--model', type=int, choices=[1, 2, 3, 4], help='1: edge model, 2: inpaint model, 3: edge-inpaint model, 4: joint model')
-    parser.add_argument('--config_file',type=str,default='./config.yml.example',help='The config file of each experiment ')
+    parser.add_argument(
+        "--path",
+        "--checkpoints",
+        type=str,
+        default="./checkpoints",
+        help="model checkpoints path (default: ./checkpoints)",
+    )
+    parser.add_argument(
+        "--model",
+        type=int,
+        choices=[1, 2, 3, 4],
+        help="1: edge model, 2: inpaint model, 3: edge-inpaint model, 4: joint model",
+    )
+    parser.add_argument(
+        "--config_file",
+        type=str,
+        default="./config.yml.example",
+        help="The config file of each experiment ",
+    )
 
-    parser.add_argument('--Discriminator',type=int,default=0,help='0: original, 1: refect pad')
-    parser.add_argument('--Generator',type=int,default=4,help='Remove IN')
-    parser.add_argument('--prior_random_degree',type=int,default=1,help='during training, how far deviate from')
-    parser.add_argument('--use_degradation_2',action='store_true',help='use the new degradation function')
+    parser.add_argument(
+        "--Discriminator", type=int, default=0, help="0: original, 1: refect pad"
+    )
+    parser.add_argument("--Generator", type=int, default=4, help="Remove IN")
+    parser.add_argument(
+        "--prior_random_degree",
+        type=int,
+        default=1,
+        help="during training, how far deviate from",
+    )
+    parser.add_argument(
+        "--use_degradation_2",
+        action="store_true",
+        help="use the new degradation function",
+    )
 
     # test mode
     if mode == 2:
-        parser.add_argument('--input', type=str, help='path to the input images directory or an input image')
-        parser.add_argument('--mask', type=str, help='path to the masks directory or a mask file')
-        parser.add_argument('--prior', type=str, help='path to the edges directory or an edge file')
-        parser.add_argument('--output', type=str, help='path to the output directory')
-        parser.add_argument('--same_face',action='store_true',help='Same face will be saved in one batch')
-        parser.add_argument('--test_batch_size',type=int,default=8,help='equals to the condition number')
-        parser.add_argument('--merge',action='store_true',help='merge the unmasked region')
+        parser.add_argument(
+            "--input",
+            type=str,
+            help="path to the input images directory or an input image",
+        )
+        parser.add_argument(
+            "--mask", type=str, help="path to the masks directory or a mask file"
+        )
+        parser.add_argument(
+            "--prior", type=str, help="path to the edges directory or an edge file"
+        )
+        parser.add_argument("--output", type=str, help="path to the output directory")
+        parser.add_argument(
+            "--same_face",
+            action="store_true",
+            help="Same face will be saved in one batch",
+        )
+        parser.add_argument(
+            "--test_batch_size",
+            type=int,
+            default=8,
+            help="equals to the condition number",
+        )
+        parser.add_argument(
+            "--merge", action="store_true", help="merge the unmasked region"
+        )
 
-
-        parser.add_argument('--score',action='store_true')
-        parser.add_argument('--condition_num',type=int,default=8,help='Use how many BERT output')
+        parser.add_argument("--score", action="store_true")
+        parser.add_argument(
+            "--condition_num", type=int, default=8, help="Use how many BERT output"
+        )
 
     args = parser.parse_args()
-    config_path = os.path.join(args.path, 'config.yml')
+    config_path = os.path.join(args.path, "config.yml")
 
     # create checkpoints path if does't exist
     if not os.path.exists(args.path):
@@ -106,8 +145,8 @@ def load_config(mode=None):
 
     # copy config template if does't exist
     # if not os.path.exists(config_path):
-    if mode==1:
-        copyfile(args.config_file, config_path) ## Training, always copy
+    if mode == 1:
+        copyfile(args.config_file, config_path)  ## Training, always copy
 
     # load config file
     config = Config(config_path)
@@ -117,11 +156,11 @@ def load_config(mode=None):
         config.MODE = 1
         if args.model:
             config.MODEL = args.model
-        
-        config.Discriminator=args.Discriminator
-        config.Generator=args.Generator
-        config.prior_random_degree=args.prior_random_degree
-        config.use_degradation_2=args.use_degradation_2
+
+        config.Discriminator = args.Discriminator
+        config.Generator = args.Generator
+        config.prior_random_degree = args.prior_random_degree
+        config.use_degradation_2 = args.use_degradation_2
 
     # test mode
     elif mode == 2:
@@ -141,15 +180,15 @@ def load_config(mode=None):
         if args.output is not None:
             config.RESULTS = args.output
 
-        config.Generator=args.Generator
-        config.EDGE=2  ## Load the prior from transformer output
-        config.same_face=args.same_face
-        config.test_batch_size=args.test_batch_size
-        config.merge=args.merge
+        config.Generator = args.Generator
+        config.EDGE = 2  ## Load the prior from transformer output
+        config.same_face = args.same_face
+        config.test_batch_size = args.test_batch_size
+        config.merge = args.merge
 
-        config.score=args.score
-        config.Discriminator=args.Discriminator
-        config.condition_num=args.condition_num
+        config.score = args.score
+        config.Discriminator = args.Discriminator
+        config.condition_num = args.condition_num
     # eval mode
     elif mode == 3:
         config.MODE = 3

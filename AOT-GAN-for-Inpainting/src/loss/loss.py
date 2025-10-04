@@ -27,7 +27,9 @@ class Perceptual(nn.Module):
         content_loss = 0.0
         prefix = [1, 2, 3, 4, 5]
         for i in range(5):
-            content_loss += self.weights[i] * self.criterion(x_vgg[f"relu{prefix[i]}_1"], y_vgg[f"relu{prefix[i]}_1"])
+            content_loss += self.weights[i] * self.criterion(
+                x_vgg[f"relu{prefix[i]}_1"], y_vgg[f"relu{prefix[i]}_1"]
+            )
         return content_loss
 
 
@@ -51,7 +53,8 @@ class Style(nn.Module):
         posfix = [2, 4, 4, 2]
         for pre, pos in list(zip(prefix, posfix)):
             style_loss += self.criterion(
-                self.compute_gram(x_vgg[f"relu{pre}_{pos}"]), self.compute_gram(y_vgg[f"relu{pre}_{pos}"])
+                self.compute_gram(x_vgg[f"relu{pre}_{pos}"]),
+                self.compute_gram(y_vgg[f"relu{pre}_{pos}"]),
             )
         return style_loss
 
@@ -91,14 +94,24 @@ class smgan:
 
         # Handle inconsistent size between outputs and masks
         if h != ht or w != wt:
-            g_fake = F.interpolate(g_fake, size=(ht, wt), mode="bilinear", align_corners=True)
-            d_fake = F.interpolate(d_fake, size=(ht, wt), mode="bilinear", align_corners=True)
-            d_real = F.interpolate(d_real, size=(ht, wt), mode="bilinear", align_corners=True)
-        d_fake_label = gaussian_blur(masks, (self.ksize, self.ksize), (10, 10)).detach().cuda()
+            g_fake = F.interpolate(
+                g_fake, size=(ht, wt), mode="bilinear", align_corners=True
+            )
+            d_fake = F.interpolate(
+                d_fake, size=(ht, wt), mode="bilinear", align_corners=True
+            )
+            d_real = F.interpolate(
+                d_real, size=(ht, wt), mode="bilinear", align_corners=True
+            )
+        d_fake_label = (
+            gaussian_blur(masks, (self.ksize, self.ksize), (10, 10)).detach().cuda()
+        )
         d_real_label = torch.zeros_like(d_real).cuda()
         g_fake_label = torch.ones_like(g_fake).cuda()
 
-        dis_loss = self.loss_fn(d_fake, d_fake_label) + self.loss_fn(d_real, d_real_label)
+        dis_loss = self.loss_fn(d_fake, d_fake_label) + self.loss_fn(
+            d_real, d_real_label
+        )
         gen_loss = self.loss_fn(g_fake, g_fake_label) * masks / torch.mean(masks)
 
         return dis_loss.mean(), gen_loss.mean()

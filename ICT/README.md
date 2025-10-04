@@ -64,7 +64,7 @@ python main.py --name [exp_name] --ckpt_path [save_path] \
                --image_size [input_resolution]
 ```
 
-Notes of transformer: 
+Notes of transformer:
 + `--AMP`: Reduce the memory cost while training, but sometimes will lead to NAN.
 + `--use_ImageFolder`: Enable this option while training on ImageNet
 + `--random_stroke`: Generate the mask on-the-fly.
@@ -79,7 +79,7 @@ python train.py --model 2 --checkpoints [save_path] \
                 --Generator 4 --use_degradation_2
 ```
 
-Notes of guided upsampling: 
+Notes of guided upsampling:
 + `--use_degradation_2`: Bilinear downsampling. Try to match the transformer training.
 + `--prior_random_degree`: Stochastically deviate the sequence elements by K nearest neighbour.
 + Modify the provided config template according to your own training environments.
@@ -96,7 +96,7 @@ python run.py --input_image [test_image_folder] \
               --ImageNet --visualize_all
 ```
 
-Notes of inference: 
+Notes of inference:
 + `--sample_num`: How many completion results do you want?
 + `--visualize_all`: You could save each output result via disabling this option.
 + `--ImageNet` `--FFHQ` `--Places2_Nature`: You must enable one option to select corresponding ckpts.
@@ -132,7 +132,7 @@ If you find our work useful for your research, please consider citing the follow
   year={2021}
 }
 ```
-The real-world application of image inpainting is also ready! Try and cite our **old photo restoration** algorithm [here](https://github.com/microsoft/Bringing-Old-Photos-Back-to-Life). 
+The real-world application of image inpainting is also ready! Try and cite our **old photo restoration** algorithm [here](https://github.com/microsoft/Bringing-Old-Photos-Back-to-Life).
 
 ```bibtex
 @inproceedings{wan2020bringing,
@@ -149,4 +149,4 @@ year={2020}
 
 ## :incoming_envelope: Contact
 
-This repo is currently maintained by Ziyu Wan ([@Raywzy](https://github.com/raywzy)) and is for academic research use only. Discussions and questions are welcome via raywzy@gmail.com. 
+This repo is currently maintained by Ziyu Wan ([@Raywzy](https://github.com/raywzy)) and is for academic research use only. Discussions and questions are welcome via raywzy@gmail.com.

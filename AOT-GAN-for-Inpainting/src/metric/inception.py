@@ -19,7 +19,11 @@ class InceptionV3(nn.Module):
     }
 
     def __init__(
-        self, output_blocks=[DEFAULT_BLOCK_INDEX], resize_input=True, normalize_input=True, requires_grad=False
+        self,
+        output_blocks=[DEFAULT_BLOCK_INDEX],
+        resize_input=True,
+        normalize_input=True,
+        requires_grad=False,
     ):
         """Build pretrained InceptionV3
         Parameters
@@ -64,7 +68,11 @@ class InceptionV3(nn.Module):
 
         # Block 1: maxpool1 to maxpool2
         if self.last_needed_block >= 1:
-            block1 = [inception.Conv2d_3b_1x1, inception.Conv2d_4a_3x3, nn.MaxPool2d(kernel_size=3, stride=2)]
+            block1 = [
+                inception.Conv2d_3b_1x1,
+                inception.Conv2d_4a_3x3,
+                nn.MaxPool2d(kernel_size=3, stride=2),
+            ]
             self.blocks.append(nn.Sequential(*block1))
 
         # Block 2: maxpool2 to aux classifier

@@ -30,6 +30,7 @@ from collections import defaultdict
 
 from guided_diffusion.scheduler import get_schedule_jump
 
+
 def get_named_beta_schedule(schedule_name, num_diffusion_timesteps, use_scale):
     """
     Get a pre-defined beta schedule for the given name.
@@ -53,6 +54,7 @@ def get_named_beta_schedule(schedule_name, num_diffusion_timesteps, use_scale):
         return np.linspace(
             beta_start, beta_end, num_diffusion_timesteps, dtype=np.float64
         )
+
 
 class ModelMeanType(enum.Enum):
     """
@@ -115,7 +117,7 @@ class GaussianDiffusion:
         model_var_type,
         loss_type,
         rescale_timesteps=False,
-        conf=None
+        conf=None,
     ):
         self.model_mean_type = model_mean_type
         self.model_var_type = model_var_type
@@ -135,8 +137,7 @@ class GaussianDiffusion:
         alphas = 1.0 - betas
         self.alphas_cumprod = np.cumprod(alphas, axis=0)
         self.alphas_cumprod_prev = np.append(1.0, self.alphas_cumprod[:-1])
-        self.alphas_cumprod_prev_prev = np.append(
-            1.0, self.alphas_cumprod_prev[:-1])
+        self.alphas_cumprod_prev_prev = np.append(1.0, self.alphas_cumprod_prev[:-1])
 
         self.alphas_cumprod_next = np.append(self.alphas_cumprod[1:], 0.0)
 
@@ -147,19 +148,16 @@ class GaussianDiffusion:
         self.sqrt_one_minus_alphas_cumprod = np.sqrt(1.0 - self.alphas_cumprod)
         self.log_one_minus_alphas_cumprod = np.log(1.0 - self.alphas_cumprod)
         self.sqrt_recip_alphas_cumprod = np.sqrt(1.0 / self.alphas_cumprod)
-        self.sqrt_recipm1_alphas_cumprod = np.sqrt(
-            1.0 / self.alphas_cumprod - 1)
+        self.sqrt_recipm1_alphas_cumprod = np.sqrt(1.0 / self.alphas_cumprod - 1)
 
         self.posterior_variance = (
-            betas * (1.0 - self.alphas_cumprod_prev) /
-            (1.0 - self.alphas_cumprod)
+            betas * (1.0 - self.alphas_cumprod_prev) / (1.0 - self.alphas_cumprod)
         )
         self.posterior_log_variance_clipped = np.log(
             np.append(self.posterior_variance[1], self.posterior_variance[1:])
         )
         self.posterior_mean_coef1 = (
-            betas * np.sqrt(self.alphas_cumprod_prev) /
-            (1.0 - self.alphas_cumprod)
+            betas * np.sqrt(self.alphas_cumprod_prev) / (1.0 - self.alphas_cumprod)
         )
         self.posterior_mean_coef2 = (
             (1.0 - self.alphas_cumprod_prev)
@@ -173,8 +171,9 @@ class GaussianDiffusion:
     def _undo(self, img_out, t):
         beta = _extract_into_tensor(self.betas, t, img_out.shape)
 
-        img_in_est = th.sqrt(1 - beta) * img_out + \
-            th.sqrt(beta) * th.randn_like(img_out)
+        img_in_est = th.sqrt(1 - beta) * img_out + th.sqrt(beta) * th.randn_like(
+            img_out
+        )
 
         return img_in_est
 
@@ -187,13 +186,10 @@ class GaussianDiffusion:
         """
         assert x_start.shape == x_t.shape
         posterior_mean = (
-            _extract_into_tensor(self.posterior_mean_coef1,
-                                 t, x_t.shape) * x_start
-            + _extract_into_tensor(self.posterior_mean_coef2,
-                                   t, x_t.shape) * x_t
+            _extract_into_tensor(self.posterior_mean_coef1, t, x_t.shape) * x_start
+            + _extract_into_tensor(self.posterior_mean_coef2, t, x_t.shape) * x_t
         )
-        posterior_variance = _extract_into_tensor(
-            self.posterior_variance, t, x_t.shape)
+        posterior_variance = _extract_into_tensor(self.posterior_variance, t, x_t.shape)
         posterior_log_variance_clipped = _extract_into_tensor(
             self.posterior_log_variance_clipped, t, x_t.shape
         )
@@ -290,8 +286,7 @@ class GaussianDiffusion:
     def _predict_xstart_from_eps(self, x_t, t, eps):
         assert x_t.shape == eps.shape
         return (
-            _extract_into_tensor(
-                self.sqrt_recip_alphas_cumprod, t, x_t.shape) * x_t
+            _extract_into_tensor(self.sqrt_recip_alphas_cumprod, t, x_t.shape) * x_t
             - _extract_into_tensor(self.sqrt_recipm1_alphas_cumprod, t, x_t.shape) * eps
         )
 
@@ -307,10 +302,8 @@ class GaussianDiffusion:
 
         gradient = cond_fn(x, self._scale_timesteps(t), **model_kwargs)
 
-
         new_mean = (
-            p_mean_var["mean"].float() + p_mean_var["variance"] *
-            gradient.float()
+            p_mean_var["mean"].float() + p_mean_var["variance"] * gradient.float()
         )
         return new_mean
 
@@ -326,7 +319,7 @@ class GaussianDiffusion:
         conf=None,
         meas_fn=None,
         pred_xstart=None,
-        idx_wall=-1
+        idx_wall=-1,
     ):
         """
         Sample x_{t-1} from the model at the given timestep.
@@ -350,14 +343,13 @@ class GaussianDiffusion:
         if conf.inpa_inj_sched_prev:
 
             if pred_xstart is not None:
-                gt_keep_mask = model_kwargs.get('gt_keep_mask')
+                gt_keep_mask = model_kwargs.get("gt_keep_mask")
                 if gt_keep_mask is None:
                     gt_keep_mask = conf.get_inpa_mask(x)
 
-                gt = model_kwargs['gt']
+                gt = model_kwargs["gt"]
 
-                alpha_cumprod = _extract_into_tensor(
-                    self.alphas_cumprod, t, x.shape)
+                alpha_cumprod = _extract_into_tensor(self.alphas_cumprod, t, x.shape)
 
                 if conf.inpa_inj_sched_prev_cumnoise:
                     weighed_gt = self.get_gt_noised(gt, int(t[0].item()))
@@ -370,16 +362,7 @@ class GaussianDiffusion:
 
                     weighed_gt = gt_part + noise_part
 
-                x = (
-                    gt_keep_mask * (
-                        weighed_gt
-                    )
-                    +
-                    (1 - gt_keep_mask) * (
-                        x
-                    )
-                )
-
+                x = gt_keep_mask * (weighed_gt) + (1 - gt_keep_mask) * (x)
 
         out = self.p_mean_variance(
             model,
@@ -390,20 +373,20 @@ class GaussianDiffusion:
             model_kwargs=model_kwargs,
         )
 
-        nonzero_mask = (
-            (t != 0).float().view(-1, *([1] * (len(x.shape) - 1)))
-        ) 
+        nonzero_mask = (t != 0).float().view(-1, *([1] * (len(x.shape) - 1)))
 
         if cond_fn is not None:
             out["mean"] = self.condition_mean(
                 cond_fn, out, x, t, model_kwargs=model_kwargs
             )
 
-        sample = out["mean"] + nonzero_mask * \
-            th.exp(0.5 * out["log_variance"]) * noise
+        sample = out["mean"] + nonzero_mask * th.exp(0.5 * out["log_variance"]) * noise
 
-        result = {"sample": sample,
-                  "pred_xstart": out["pred_xstart"], 'gt': model_kwargs.get('gt')}
+        result = {
+            "sample": sample,
+            "pred_xstart": out["pred_xstart"],
+            "gt": model_kwargs.get("gt"),
+        }
 
         return result
 
@@ -419,7 +402,7 @@ class GaussianDiffusion:
         device=None,
         progress=True,
         return_all=False,
-        conf=None
+        conf=None,
     ):
         """
         Generate samples from the model.
@@ -451,7 +434,7 @@ class GaussianDiffusion:
             model_kwargs=model_kwargs,
             device=device,
             progress=progress,
-            conf=conf
+            conf=conf,
         ):
             final = sample
 
@@ -471,7 +454,7 @@ class GaussianDiffusion:
         model_kwargs=None,
         device=None,
         progress=False,
-        conf=None
+        conf=None,
     ):
         """
         Generate samples from the model and yield intermediate samples from
@@ -489,10 +472,9 @@ class GaussianDiffusion:
         else:
             image_after_step = th.randn(*shape, device=device)
 
-        debug_steps = conf.pget('debug.num_timesteps')
+        debug_steps = conf.pget("debug.num_timesteps")
 
         self.gt_noises = None  # reset for next image
-
 
         pred_xstart = None
 
@@ -505,12 +487,14 @@ class GaussianDiffusion:
             time_pairs = list(zip(times[:-1], times[1:]))
             if progress:
                 from tqdm.auto import tqdm
+
                 time_pairs = tqdm(time_pairs)
 
             for t_last, t_cur in time_pairs:
                 idx_wall += 1
-                t_last_t = th.tensor([t_last] * shape[0],  # pylint: disable=not-callable
-                                     device=device)
+                t_last_t = th.tensor(
+                    [t_last] * shape[0], device=device  # pylint: disable=not-callable
+                )
 
                 if t_cur < t_last:  # reverse
                     with th.no_grad():
@@ -524,7 +508,7 @@ class GaussianDiffusion:
                             cond_fn=cond_fn,
                             model_kwargs=model_kwargs,
                             conf=conf,
-                            pred_xstart=pred_xstart
+                            pred_xstart=pred_xstart,
                         )
                         image_after_step = out["sample"]
                         pred_xstart = out["pred_xstart"]
@@ -534,13 +518,18 @@ class GaussianDiffusion:
                         yield out
 
                 else:
-                    t_shift = conf.get('inpa_inj_time_shift', 1)
+                    t_shift = conf.get("inpa_inj_time_shift", 1)
 
                     image_before_step = image_after_step.clone()
                     image_after_step = self.undo(
-                        image_before_step, image_after_step,
-                        est_x_0=out['pred_xstart'], t=t_last_t+t_shift, debug=False)
+                        image_before_step,
+                        image_after_step,
+                        est_x_0=out["pred_xstart"],
+                        t=t_last_t + t_shift,
+                        debug=False,
+                    )
                     pred_xstart = out["pred_xstart"]
+
 
 def _extract_into_tensor(arr, timesteps, broadcast_shape):
     """

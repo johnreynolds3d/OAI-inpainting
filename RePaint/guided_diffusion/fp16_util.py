@@ -190,7 +190,7 @@ class MixedPrecisionTrainer:
 
     def backward(self, loss: th.Tensor):
         if self.use_fp16:
-            loss_scale = 2 ** self.lg_loss_scale
+            loss_scale = 2**self.lg_loss_scale
             (loss * loss_scale).backward()
         else:
             loss.backward()
@@ -203,14 +203,14 @@ class MixedPrecisionTrainer:
 
     def _optimize_fp16(self, opt: th.optim.Optimizer):
         model_grads_to_master_grads(self.param_groups_and_shapes, self.master_params)
-        grad_norm, param_norm = self._compute_norms(grad_scale=2 ** self.lg_loss_scale)
+        grad_norm, param_norm = self._compute_norms(grad_scale=2**self.lg_loss_scale)
         if check_overflow(grad_norm):
             self.lg_loss_scale -= 1
             zero_master_grads(self.master_params)
             return False
 
         for p in self.master_params:
-            p.grad.mul_(1.0 / (2 ** self.lg_loss_scale))
+            p.grad.mul_(1.0 / (2**self.lg_loss_scale))
         opt.step()
         zero_master_grads(self.master_params)
         master_params_to_model_params(self.param_groups_and_shapes, self.master_params)

@@ -80,7 +80,7 @@ If you work with other data than faces, places or general images, train a model 
 
 **How to design a new schedule?**
 
-Fill in your own parameters in this [line](https://github.com/andreas128/RePaint/blob/0fea066b52346c331cdf1bf7aed616c8c8896714/guided_diffusion/scheduler.py#L180) to visualize the schedule using `python guided_diffusion/scheduler.py`. Then copy a config file, set your parameters in these [lines](https://github.com/andreas128/RePaint/blob/0fea066b52346c331cdf1bf7aed616c8c8896714/confs/face_example.yml#L61-L65) and run the inference using `python test.py --conf_path confs/my_schedule.yml`. 
+Fill in your own parameters in this [line](https://github.com/andreas128/RePaint/blob/0fea066b52346c331cdf1bf7aed616c8c8896714/guided_diffusion/scheduler.py#L180) to visualize the schedule using `python guided_diffusion/scheduler.py`. Then copy a config file, set your parameters in these [lines](https://github.com/andreas128/RePaint/blob/0fea066b52346c331cdf1bf7aed616c8c8896714/confs/face_example.yml#L61-L65) and run the inference using `python test.py --conf_path confs/my_schedule.yml`.
 
 **How to speed up the inference?**
 

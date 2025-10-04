@@ -101,18 +101,20 @@ def manual_balanced_split(df, train_ratio=0.8, val_ratio=0.1, test_ratio=0.1):
     # Separate by class
     osteo_samples = df[df["is_osteo"] == True].reset_index(drop=True)
     normal_samples = df[df["is_osteo"] == False].reset_index(drop=True)
-    
-    print(f"Available samples: {len(osteo_samples)} osteoporotic, {len(normal_samples)} normal")
-    
+
+    print(
+        f"Available samples: {len(osteo_samples)} osteoporotic, {len(normal_samples)} normal"
+    )
+
     # Use the smaller class as the limiting factor
     min_class_size = min(len(osteo_samples), len(normal_samples))
     print(f"Using {min_class_size} samples from each class")
-    
+
     # Calculate exact numbers for each split
     train_per_class = int(min_class_size * train_ratio)
     val_per_class = int(min_class_size * val_ratio)
     test_per_class = int(min_class_size * test_ratio)
-    
+
     # Adjust if we don't have enough samples
     total_needed = (train_per_class + val_per_class + test_per_class) * 2
     if total_needed > min_class_size * 2:
@@ -121,36 +123,64 @@ def manual_balanced_split(df, train_ratio=0.8, val_ratio=0.1, test_ratio=0.1):
         train_per_class = int(train_per_class * scale_factor)
         val_per_class = int(val_per_class * scale_factor)
         test_per_class = int(test_per_class * scale_factor)
-    
-    print(f"Split per class: Train={train_per_class}, Val={val_per_class}, Test={test_per_class}")
-    
+
+    print(
+        f"Split per class: Train={train_per_class}, Val={val_per_class}, Test={test_per_class}"
+    )
+
     # Set random seed for reproducibility
     np.random.seed(42)
-    
+
     # Sample from each class
-    osteo_shuffled = osteo_samples.sample(n=min_class_size, random_state=42).reset_index(drop=True)
-    normal_shuffled = normal_samples.sample(n=min_class_size, random_state=42).reset_index(drop=True)
-    
+    osteo_shuffled = osteo_samples.sample(
+        n=min_class_size, random_state=42
+    ).reset_index(drop=True)
+    normal_shuffled = normal_samples.sample(
+        n=min_class_size, random_state=42
+    ).reset_index(drop=True)
+
     # Create splits manually
     train_osteo = osteo_shuffled[:train_per_class]
-    val_osteo = osteo_shuffled[train_per_class:train_per_class + val_per_class]
-    test_osteo = osteo_shuffled[train_per_class + val_per_class:train_per_class + val_per_class + test_per_class]
-    
+    val_osteo = osteo_shuffled[train_per_class : train_per_class + val_per_class]
+    test_osteo = osteo_shuffled[
+        train_per_class
+        + val_per_class : train_per_class
+        + val_per_class
+        + test_per_class
+    ]
+
     train_normal = normal_shuffled[:train_per_class]
-    val_normal = normal_shuffled[train_per_class:train_per_class + val_per_class]
-    test_normal = normal_shuffled[train_per_class + val_per_class:train_per_class + val_per_class + test_per_class]
-    
+    val_normal = normal_shuffled[train_per_class : train_per_class + val_per_class]
+    test_normal = normal_shuffled[
+        train_per_class
+        + val_per_class : train_per_class
+        + val_per_class
+        + test_per_class
+    ]
+
     # Combine splits
-    train_df = pd.concat([train_osteo, train_normal], ignore_index=True).sample(frac=1, random_state=42).reset_index(drop=True)
-    val_df = pd.concat([val_osteo, val_normal], ignore_index=True).sample(frac=1, random_state=42).reset_index(drop=True)
-    test_df = pd.concat([test_osteo, test_normal], ignore_index=True).sample(frac=1, random_state=42).reset_index(drop=True)
-    
+    train_df = (
+        pd.concat([train_osteo, train_normal], ignore_index=True)
+        .sample(frac=1, random_state=42)
+        .reset_index(drop=True)
+    )
+    val_df = (
+        pd.concat([val_osteo, val_normal], ignore_index=True)
+        .sample(frac=1, random_state=42)
+        .reset_index(drop=True)
+    )
+    test_df = (
+        pd.concat([test_osteo, test_normal], ignore_index=True)
+        .sample(frac=1, random_state=42)
+        .reset_index(drop=True)
+    )
+
     return train_df, val_df, test_df
 
 
 def create_balanced_splits():
     """Create perfectly balanced train/validation/test splits."""
-    
+
     # Load the CSV data
     print("Loading BMD data...")
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -169,8 +199,12 @@ def create_balanced_splits():
     # Check class distribution
     class_counts = df["class"].value_counts()
     print(f"\nClass distribution:")
-    print(f"Osteoporotic: {class_counts['osteoporotic']} ({class_counts['osteoporotic']/len(df)*100:.1f}%)")
-    print(f"Normal: {class_counts['normal']} ({class_counts['normal']/len(df)*100:.1f}%)")
+    print(
+        f"Osteoporotic: {class_counts['osteoporotic']} ({class_counts['osteoporotic']/len(df)*100:.1f}%)"
+    )
+    print(
+        f"Normal: {class_counts['normal']} ({class_counts['normal']/len(df)*100:.1f}%)"
+    )
 
     # Create perfectly balanced splits
     print(f"\n🎯 Creating PERFECTLY balanced splits...")
@@ -178,19 +212,29 @@ def create_balanced_splits():
 
     # Verify splits
     print(f"\nSplit sizes:")
-    print(f"Train: {len(train_df)} ({len(train_df)/(len(train_df)+len(val_df)+len(test_df))*100:.1f}%)")
-    print(f"Validation: {len(val_df)} ({len(val_df)/(len(train_df)+len(val_df)+len(test_df))*100:.1f}%)")
-    print(f"Test: {len(test_df)} ({len(test_df)/(len(train_df)+len(val_df)+len(test_df))*100:.1f}%)")
+    print(
+        f"Train: {len(train_df)} ({len(train_df)/(len(train_df)+len(val_df)+len(test_df))*100:.1f}%)"
+    )
+    print(
+        f"Validation: {len(val_df)} ({len(val_df)/(len(train_df)+len(val_df)+len(test_df))*100:.1f}%)"
+    )
+    print(
+        f"Test: {len(test_df)} ({len(test_df)/(len(train_df)+len(val_df)+len(test_df))*100:.1f}%)"
+    )
 
     # Verify PERFECT class balance in each split
-    for split_name, split_df in [("Train", train_df), ("Validation", val_df), ("Test", test_df)]:
+    for split_name, split_df in [
+        ("Train", train_df),
+        ("Validation", val_df),
+        ("Test", test_df),
+    ]:
         osteo_count = len(split_df[split_df["is_osteo"] == True])
         normal_count = len(split_df[split_df["is_osteo"] == False])
         total = len(split_df)
         print(f"\n{split_name} set class balance:")
         print(f"  Osteoporotic: {osteo_count} ({osteo_count/total*100:.1f}%)")
         print(f"  Normal: {normal_count} ({normal_count/total*100:.1f}%)")
-        
+
         # Verify perfect balance
         if osteo_count == normal_count:
             print(f"  ✅ PERFECTLY BALANCED!")
@@ -212,7 +256,7 @@ def create_balanced_splits():
         os.path.join(script_dir, "test/mask_inv"),
         os.path.join(script_dir, "test/edge"),
     ]
-    
+
     print(f"\n🧹 Cleaning existing directories...")
     for dir_name in output_dirs:
         os.makedirs(dir_name, exist_ok=True)
@@ -241,9 +285,13 @@ def create_balanced_splits():
         return copied_count, missing_count
 
     # Copy images for each split
-    train_copied, train_missing = copy_images(train_df, os.path.join(script_dir, "train/img"))
+    train_copied, train_missing = copy_images(
+        train_df, os.path.join(script_dir, "train/img")
+    )
     val_copied, val_missing = copy_images(val_df, os.path.join(script_dir, "valid/img"))
-    test_copied, test_missing = copy_images(test_df, os.path.join(script_dir, "test/img"))
+    test_copied, test_missing = copy_images(
+        test_df, os.path.join(script_dir, "test/img")
+    )
 
     print(f"\nCopy results:")
     print(f"Train: {train_copied} copied, {train_missing} missing")
@@ -253,10 +301,12 @@ def create_balanced_splits():
     # Generate masks and edge maps for each split
     print(f"\n🎭 Generating masks and edge maps for all splits...")
 
-    def generate_masks_for_split(split_df, split_name, img_dir, mask_dir, mask_inv_dir, edge_dir=None):
+    def generate_masks_for_split(
+        split_df, split_name, img_dir, mask_dir, mask_inv_dir, edge_dir=None
+    ):
         """Generate masks, inverted masks, and edge maps for all images in a split."""
         print(f"\n🎭 Generating masks for {split_name} set...")
-        
+
         os.makedirs(mask_dir, exist_ok=True)
         os.makedirs(mask_inv_dir, exist_ok=True)
         if edge_dir:
@@ -294,21 +344,24 @@ def create_balanced_splits():
 
     # Generate masks and edge maps for each split
     train_mask_success, train_mask_failed = generate_masks_for_split(
-        train_df, "train",
+        train_df,
+        "train",
         os.path.join(script_dir, "train/img"),
         os.path.join(script_dir, "train/mask"),
         os.path.join(script_dir, "train/mask_inv"),
         os.path.join(script_dir, "train/edge"),
     )
     val_mask_success, val_mask_failed = generate_masks_for_split(
-        val_df, "validation",
+        val_df,
+        "validation",
         os.path.join(script_dir, "valid/img"),
         os.path.join(script_dir, "valid/mask"),
         os.path.join(script_dir, "valid/mask_inv"),
         os.path.join(script_dir, "valid/edge"),
     )
     test_mask_success, test_mask_failed = generate_masks_for_split(
-        test_df, "test",
+        test_df,
+        "test",
         os.path.join(script_dir, "test/img"),
         os.path.join(script_dir, "test/mask"),
         os.path.join(script_dir, "test/mask_inv"),

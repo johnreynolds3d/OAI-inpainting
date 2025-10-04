@@ -30,7 +30,9 @@ def main(num_worker=8):
     fake_images = []
     pool = Pool(num_worker)
     for rimg, fimg in tqdm(
-        pool.imap_unordered(read_img, zip(real_names, fake_names)), total=len(real_names), desc="loading images"
+        pool.imap_unordered(read_img, zip(real_names, fake_names)),
+        total=len(real_names),
+        desc="loading images",
     ):
         real_images.append(rimg)
         fake_images.append(fimg)
@@ -40,7 +42,11 @@ def main(num_worker=8):
     evaluation_scores = {key: 0 for key, val in metrics.items()}
     for key, val in metrics.items():
         evaluation_scores[key] = val(real_images, fake_images, num_worker=num_worker)
-    print(" ".join(["{}: {:6f},".format(key, val) for key, val in evaluation_scores.items()]))
+    print(
+        " ".join(
+            ["{}: {:6f},".format(key, val) for key, val in evaluation_scores.items()]
+        )
+    )
 
 
 if __name__ == "__main__":

@@ -17,7 +17,9 @@ class InpaintingData(Dataset):
         # image and mask
         self.image_path = []
         for ext in ["*.jpg", "*.png"]:
-            self.image_path.extend(glob(os.path.join(args.dir_image, args.data_train, ext)))
+            self.image_path.extend(
+                glob(os.path.join(args.dir_image, args.data_train, ext))
+            )
         self.mask_path = glob(os.path.join(args.dir_mask, args.mask_type, "*.png"))
 
         # augmentation
@@ -31,9 +33,13 @@ class InpaintingData(Dataset):
         )
         self.mask_trans = transforms.Compose(
             [
-                transforms.Resize(args.image_size, interpolation=transforms.InterpolationMode.NEAREST),
+                transforms.Resize(
+                    args.image_size, interpolation=transforms.InterpolationMode.NEAREST
+                ),
                 transforms.RandomHorizontalFlip(),
-                transforms.RandomRotation((0, 45), interpolation=transforms.InterpolationMode.NEAREST),
+                transforms.RandomRotation(
+                    (0, 45), interpolation=transforms.InterpolationMode.NEAREST
+                ),
             ]
         )
 

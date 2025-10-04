@@ -9,8 +9,8 @@ class PSNR(nn.Module):
         base10 = torch.log(torch.tensor(10.0))
         max_val = torch.tensor(max_val).float()
 
-        self.register_buffer('base10', base10)
-        self.register_buffer('max_val', 20 * torch.log(max_val) / base10)
+        self.register_buffer("base10", base10)
+        self.register_buffer("max_val", 20 * torch.log(max_val) / base10)
 
     def __call__(self, a, b):
         mse = torch.mean((a.float() - b.float()) ** 2)
