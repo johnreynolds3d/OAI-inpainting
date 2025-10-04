@@ -14,6 +14,8 @@
 #
 # This repository was forked from https://github.com/openai/guided-diffusion, which is under the MIT license
 
+import os
+
 
 def get_schedule(t_T, t_0, n_sample, n_steplength, debug=0):
     if n_steplength > 1:
@@ -212,9 +214,9 @@ def get_schedule_jump_test(to_supplement=False):
     fig.tight_layout()
 
     if to_supplement:
-        out_path = (
-            "/cluster/home/alugmayr/gdiff/paper/supplement/figures/jump_sched.pdf"
-        )
+        out_path = "./supplement_figures/jump_sched.pdf"
+        # Create directory if it doesn't exist
+        os.makedirs(os.path.dirname(out_path), exist_ok=True)
         plt.savefig(out_path)
 
     out_path = "./schedule.png"
