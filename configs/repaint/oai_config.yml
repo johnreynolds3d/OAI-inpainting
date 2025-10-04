@@ -1,0 +1,37 @@
+# RePaint Configuration for OAI Dataset
+# Platform-agnostic configuration file
+
+# Model configuration
+model:
+  name: "repaint"
+  model_path: "./data/pretrained/256x256_diffusion.pt"
+  classifier_path: "./data/pretrained/256x256_classifier.pt"
+
+# Data paths (relative to project root)
+data:
+  gt_path: "./data/oai/test/img"
+  mask_path: "./data/oai/test/mask"
+  output_path: "./output/RePaint/OAI"
+
+# Inference parameters
+inference:
+  sample_num: 1
+  jump_length: 10
+  jump_n_sample: 10
+  n_steps: 1000
+  guidance_scale: 1.0
+
+# Hardware configuration
+hardware:
+  device: "cuda"
+  batch_size: 1
+
+# Visualization
+visualization:
+  visualize_all: true
+  save_intermediate: false
+
+# Paths
+paths:
+  results_dir: "./results/repaint"
+  logs_dir: "./results/logs/repaint"

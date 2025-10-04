@@ -1,0 +1,49 @@
+# AOT-GAN Configuration for OAI Dataset
+# Platform-agnostic configuration file
+
+# Data paths (relative to project root)
+data:
+  train_images: "./data/oai/train/img"
+  train_masks: "./data/oai/train/mask"
+  val_images: "./data/oai/valid/img"
+  val_masks: "./data/oai/valid/mask"
+  test_images: "./data/oai/test/img"
+  test_masks: "./data/oai/test/mask"
+
+# Model configuration
+model:
+  name: "aotgan"
+  block_num: 8
+  rates: "1+2+4+8"
+  gan_type: "smgan"
+
+# Training configuration
+training:
+  batch_size: 8
+  image_size: 512
+  mask_type: "pconv"
+  lr_g: 1e-4
+  lr_d: 1e-4
+  beta1: 0.5
+  beta2: 0.999
+  num_workers: 4
+  seed: 2021
+
+# Hardware configuration
+hardware:
+  distributed: false
+  local_rank: 0
+  tensorboard: true
+
+# Paths
+paths:
+  save_dir: "./results/logs/aot-gan"
+  outputs: "./output/AOT-GAN/OAI"
+  resume: null
+
+# Loss configuration
+loss:
+  rec_loss:
+    l1: 1.0
+    style: 1.0
+    perceptual: 1.0
