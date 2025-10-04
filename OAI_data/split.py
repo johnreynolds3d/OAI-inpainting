@@ -384,6 +384,108 @@ def create_balanced_splits():
     print(f"   test/mask/   - {test_mask_success} masks")
     print(f"\n🎯 ALL SPLITS ARE PERFECTLY BALANCED!")
 
+    # Create subset_4 for testing
+    create_subset_4(test_df, script_dir)
+
+
+def create_subset_4(test_df, script_dir):
+    """Create subset_4 with 2 osteoporotic and 2 non-osteoporotic images from test set."""
+    print(f"\n🎯 Creating subset_4 with 2 osteoporotic + 2 non-osteoporotic images...")
+
+    # Separate test data by class
+    test_osteo = test_df[test_df["is_osteo"] == True].reset_index(drop=True)
+    test_normal = test_df[test_df["is_osteo"] == False].reset_index(drop=True)
+
+    print(
+        f"Available in test set: {len(test_osteo)} osteoporotic, {len(test_normal)} normal"
+    )
+
+    # Check if we have enough samples
+    if len(test_osteo) < 2 or len(test_normal) < 2:
+        print(f"❌ Not enough samples in test set for subset_4!")
+        print(f"   Need: 2 osteoporotic, 2 normal")
+        print(f"   Have: {len(test_osteo)} osteoporotic, {len(test_normal)} normal")
+        return
+
+    # Randomly select 2 from each class
+    np.random.seed(42)  # Use same seed for reproducibility
+    selected_osteo = test_osteo.sample(n=2, random_state=42).reset_index(drop=True)
+    selected_normal = test_normal.sample(n=2, random_state=42).reset_index(drop=True)
+
+    # Combine selected samples
+    subset_4_df = pd.concat([selected_osteo, selected_normal], ignore_index=True)
+
+    print(f"Selected for subset_4:")
+    for _, row in subset_4_df.iterrows():
+        class_label = "osteoporotic" if row["is_osteo"] else "normal"
+        print(f"   {row['filename']} ({class_label})")
+
+    # Create subset_4 directories (only subset_4 subdirectories, not main test dirs)
+    subset_4_dirs = [
+        os.path.join(script_dir, "test/img/subset_4"),
+        os.path.join(script_dir, "test/mask/subset_4"),
+        os.path.join(script_dir, "test/mask/inv/subset_4"),
+        os.path.join(script_dir, "test/edge/subset_4"),
+    ]
+
+    # Safety check: ensure we're only working with subset_4 subdirectories
+    for dir_path in subset_4_dirs:
+        if not dir_path.endswith("/subset_4"):
+            raise ValueError(
+                f"Safety check failed: {dir_path} is not a subset_4 directory!"
+            )
+
+    print(f"\n📁 Creating subset_4 directories...")
+    for dir_path in subset_4_dirs:
+        os.makedirs(dir_path, exist_ok=True)
+        # Clean existing files to avoid conflicts
+        clean_directory(dir_path)
+        print(f"   Created and cleaned: {os.path.relpath(dir_path, script_dir)}/")
+
+    # Copy selected images and their masks
+    print(f"\n📋 Copying subset_4 files...")
+    copied_count = 0
+
+    for _, row in subset_4_df.iterrows():
+        filename = row["filename"]
+        mask_filename = os.path.splitext(filename)[0] + ".png"
+
+        # Source paths
+        src_img = os.path.join(script_dir, "test/img", filename)
+        src_mask = os.path.join(script_dir, "test/mask", mask_filename)
+        src_mask_inv = os.path.join(script_dir, "test/mask/inv", mask_filename)
+        src_edge = os.path.join(script_dir, "test/edge", mask_filename)
+
+        # Destination paths
+        dst_img = os.path.join(script_dir, "test/img/subset_4", filename)
+        dst_mask = os.path.join(script_dir, "test/mask/subset_4", mask_filename)
+        dst_mask_inv = os.path.join(script_dir, "test/mask/inv/subset_4", mask_filename)
+        dst_edge = os.path.join(script_dir, "test/edge/subset_4", mask_filename)
+
+        # Copy files
+        files_to_copy = [
+            (src_img, dst_img),
+            (src_mask, dst_mask),
+            (src_mask_inv, dst_mask_inv),
+            (src_edge, dst_edge),
+        ]
+
+        for src, dst in files_to_copy:
+            if os.path.exists(src):
+                shutil.copy2(src, dst)
+                copied_count += 1
+            else:
+                print(f"   Warning: {src} not found!")
+
+    # Save subset_4 info
+    subset_4_df.to_csv(os.path.join(script_dir, "test/subset_4_info.csv"), index=False)
+
+    print(f"\n✅ Subset_4 created successfully!")
+    print(f"   📁 Location: test/*/subset_4/")
+    print(f"   📊 Files copied: {copied_count}")
+    print(f"   📋 Info saved: test/subset_4_info.csv")
+    print(f"   🎯 Perfect balance: 2 osteoporotic + 2 normal images")
+
 
 if __name__ == "__main__":
     create_balanced_splits()

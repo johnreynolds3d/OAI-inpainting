@@ -1,40 +1,10 @@
-# Python
+# Python cache files
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
 
-# PyTorch
-*.pt
-*.pth
-*.pkl
-*.pickle
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# Environment variables
+# Virtual environments
 .env
 .venv
 env/
@@ -43,14 +13,14 @@ ENV/
 env.bak/
 venv.bak/
 
-# IDE
+# IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS
+# OS files
 .DS_Store
 .DS_Store?
 ._*
@@ -59,11 +29,32 @@ venv.bak/
 ehthumbs.db
 Thumbs.db
 
-# Logs
+# Model checkpoints and weights
+*.pt
+*.pth
+*.pkl
+*.pickle
+
+# Log files
 *.log
 logs/
 tensorboard_logs/
 events.*
+
+# Image files
+*.png
+*.jpg
+*.jpeg
+*.tiff
+*.bmp
+*.gif
+
+# Large data directories (keep structure, ignore large files)
+OAI_data/gt_img/
+OAI_data/train/
+OAI_data/valid/
+OAI_data/test/
+RePaint/data/
 
 # Model checkpoints and experiments
 experiments/
@@ -72,35 +63,16 @@ output/
 checkpoints/
 runs/
 
-# Large data directories
-OAI_data/gt_img/
-OAI_data/train/
-OAI_data/valid/
-OAI_data/test/
-RePaint/data/
-
 # Temporary files
 *.tmp
 *.temp
 temp/
 tmp/
 
-# Configuration files with sensitive data
+# Sensitive files
 *.key
 *.pem
 secrets/
-
-# Large image files (keep source code but ignore large datasets)
-*.png
-*.jpg
-*.jpeg
-*.tiff
-*.bmp
-*.gif
-
-# Text files that might be large logs
-*.txt
-*.out
 
 # Backup files
 *.bak
