@@ -1,0 +1,108 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyTorch
+*.pt
+*.pth
+*.pkl
+*.pickle
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Environment variables
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+tensorboard_logs/
+events.*
+
+# Model checkpoints and experiments
+experiments/
+ckpts_ICT/
+output/
+checkpoints/
+runs/
+
+# Large data directories
+OAI_data/gt_img/
+OAI_data/train/
+OAI_data/valid/
+OAI_data/test/
+RePaint/data/
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Configuration files with sensitive data
+*.key
+*.pem
+secrets/
+
+# Large image files (keep source code but ignore large datasets)
+*.png
+*.jpg
+*.jpeg
+*.tiff
+*.bmp
+*.gif
+
+# Text files that might be large logs
+*.txt
+*.out
+
+# Backup files
+*.bak
+*.backup
+*~
