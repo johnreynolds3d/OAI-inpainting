@@ -54,7 +54,9 @@ OAI_data/gt_img/
 OAI_data/train/
 OAI_data/valid/
 OAI_data/test/
-RePaint/data/
+
+# RePaint data - ignore pretrained models but track datasets
+RePaint/data/pretrained/
 
 # Model checkpoints and experiments
 experiments/
