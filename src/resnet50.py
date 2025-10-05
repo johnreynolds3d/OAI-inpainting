@@ -231,7 +231,9 @@ model.eval()  # Set model to evaluation mode (disables dropout, etc.)
 predictions = []
 actuals = []
 
-with torch.no_grad():  # Disable gradient computation for evaluation (faster, uses less memory)
+with (
+    torch.no_grad()
+):  # Disable gradient computation for evaluation (faster, uses less memory)
     for images, labels in test_loader:
         images = images.to(device)
         labels = labels.to(device).unsqueeze(1)
