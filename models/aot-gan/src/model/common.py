@@ -3,7 +3,7 @@ from torch import nn
 
 class BaseNetwork(nn.Module):
     def __init__(self):
-        super(BaseNetwork, self).__init__()
+        super().__init__()
 
     def print_network(self):
         if isinstance(self, list):
@@ -12,9 +12,8 @@ class BaseNetwork(nn.Module):
         for param in self.parameters():
             num_params += param.numel()
         print(
-            "Network [%s] was created. Total number of parameters: %.1f million. "
+            f"Network [{type(self).__name__}] was created. Total number of parameters: {num_params / 1000000:.1f} million. "
             "To see the architecture, do print(network)."
-            % (type(self).__name__, num_params / 1000000)
         )
 
     def init_weights(self, init_type="normal", gain=0.02):
@@ -48,7 +47,7 @@ class BaseNetwork(nn.Module):
                     m.reset_parameters()
                 else:
                     raise NotImplementedError(
-                        "initialization method [%s] is not implemented" % init_type
+                        f"initialization method [{init_type}] is not implemented"
                     )
                 if hasattr(m, "bias") and m.bias is not None:
                     nn.init.constant_(m.bias.data, 0.0)

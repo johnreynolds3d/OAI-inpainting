@@ -19,7 +19,7 @@ class Dataset(torch.utils.data.Dataset):
     def __init__(
         self, config, flist, edge_flist, mask_flist, augment=True, training=True
     ):
-        super(Dataset, self).__init__()
+        super().__init__()
         self.augment = augment
         self.training = training
         self.data = self.load_flist(flist)
@@ -240,14 +240,13 @@ class Dataset(torch.utils.data.Dataset):
                 dataset=self, batch_size=batch_size, drop_last=True
             )
 
-            for item in sample_loader:
-                yield item
+            yield from sample_loader
 
     def getfilelist(self, path):
         all_file = []
-        for dir, folder, file in os.walk(path):
+        for dir, _folder, file in os.walk(path):
             for i in file:
-                t = "%s/%s" % (dir, i)
+                t = f"{dir}/{i}"
                 if (
                     t.endswith(".png")
                     or t.endswith(".jpg")

@@ -46,7 +46,7 @@ class InceptionV3(nn.Module):
           If true, parameters of the model require gradient. Possibly useful
           for finetuning the network
         """
-        super(InceptionV3, self).__init__()
+        super().__init__()
         self.resize_input = resize_input
         self.normalize_input = normalize_input
         self.output_blocks = sorted(output_blocks)

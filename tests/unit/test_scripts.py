@@ -180,7 +180,7 @@ def test_script_shebang():
     for script_file in script_files:
         script_path = Path(script_file)
         if script_path.exists():
-            with open(script_path) as f:
+            with script_path.open() as f:
                 first_line = f.readline().strip()
                 # Check for Python shebang
                 assert first_line.startswith("#!"), f"{script_file} should have shebang"

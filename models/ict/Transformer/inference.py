@@ -102,7 +102,7 @@ if __name__ == "__main__":
     if opts.skip_number > 0:
         img_list = img_list[opts.skip_number - 1 :]
         mask_list = mask_list[opts.skip_number - 1 :]
-        print("Resume from %s" % (img_list[0]))
+        print(f"Resume from {img_list[0]}")
 
     if opts.BERT:
         for x_name, y_name in zip(img_list, mask_list):
@@ -168,7 +168,7 @@ if __name__ == "__main__":
                 )
                 tmp = Image.fromarray(current_img)
                 tmp.save(os.path.join(current_url, img_name))
-            print("Finish %s" % (img_name))
+            print(f"Finish {img_name}")
 
         e_time = time.time()
         print("This test totally costs %.5f seconds" % (e_time - s_time))

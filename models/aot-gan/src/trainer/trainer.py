@@ -113,9 +113,9 @@ class Trainer:
             )
             timer_data, timer_model = timer(), timer()
 
-        for idx in pbar:
+        for _idx in pbar:
             self.iteration += 1
-            images, masks, filename = next(self.dataloader)
+            images, masks, _filename = next(self.dataloader)
             images, masks = images.cuda(), masks.cuda()
             images_masked = (images * (1 - masks).float()) + masks
 

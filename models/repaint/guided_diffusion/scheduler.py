@@ -18,9 +18,8 @@ import os
 
 
 def get_schedule(t_T, t_0, n_sample, n_steplength, debug=0):
-    if n_steplength > 1:
-        if not n_sample > 1:
-            raise RuntimeError("n_steplength has no effect if n_sample=1")
+    if n_steplength > 1 and not n_sample > 1:
+        raise RuntimeError("n_steplength has no effect if n_sample=1")
 
     t = t_T
     times = [t]

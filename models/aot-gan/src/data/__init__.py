@@ -5,8 +5,7 @@ from .dataset import InpaintingData
 
 def sample_data(loader):
     while True:
-        for batch in loader:
-            yield batch
+        yield from loader
 
 
 def create_loader(args):

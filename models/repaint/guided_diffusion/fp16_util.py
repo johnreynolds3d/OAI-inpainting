@@ -202,7 +202,7 @@ class MixedPrecisionTrainer:
 
     def _optimize_fp16(self, opt: th.optim.Optimizer):
         model_grads_to_master_grads(self.param_groups_and_shapes, self.master_params)
-        grad_norm, param_norm = self._compute_norms(grad_scale=2**self.lg_loss_scale)
+        grad_norm, _param_norm = self._compute_norms(grad_scale=2**self.lg_loss_scale)
         if check_overflow(grad_norm):
             self.lg_loss_scale -= 1
             zero_master_grads(self.master_params)
@@ -217,7 +217,7 @@ class MixedPrecisionTrainer:
         return True
 
     def _optimize_normal(self, opt: th.optim.Optimizer):
-        grad_norm, param_norm = self._compute_norms()
+        _grad_norm, _param_norm = self._compute_norms()
         opt.step()
         return True
 

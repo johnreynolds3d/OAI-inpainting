@@ -1,5 +1,7 @@
 # Data Handling
+import csv
 import os  # For handling file and directory paths
+from pathlib import Path
 
 import matplotlib.pyplot as plt  # For plotting graphs, the training loss curve at the end per epoch
 import pandas as pd  # For reading and manipulating CSV/tabular data
@@ -76,11 +78,7 @@ df = pd.read_csv(CSV_PATH, header=None)
 # sections
 train_val, test = train_test_split(df, test_size=0.1, random_state=1)
 
-# Further split the 90% train+val portion into:
-#   80% training
-#   10% validation
-# So we split train_val using test_size=0.1111 because:
-#   0.1 * 90% =..kinda 10% (roughly matching the test split)
+# Further split the 90% train+val portion into 80% training and 10% validation
 train, val = train_test_split(train_val, test_size=0.1, random_state=1)
 
 
@@ -138,15 +136,7 @@ for param in model.layer4.parameters():
     param.requires_grad = True
 
 # Replace FC layer
-# Replace the final fully connected (fc) layer
-# By default, ResNet-50's final layer is:
-#     nn.Linear(2048, 1000)
-# This is designed for ImageNet classification with 1000 output classes.
-# But in our case, we are solving a regression problem, not classification.
-# We want the model to predict a single continuous value: the BMD (bone mineral density).
-# So we replace the fc layer with:
-#     nn.Linear(2048, 1)
-# This means the model will output a single floating-point value per image.
+# Replace the final fully connected layer for regression (BMD prediction)
 model.fc = nn.Linear(model.fc.in_features, 1)
 
 # Move the model to GPU if available (or CPU otherwise)
@@ -186,7 +176,8 @@ for epoch in range(num_epochs):
     for images, labels in train_loader:
         # Move images and labels to the GPU (if available)
         # unsqueeze(1) adds dimension to match model output shape: [batch_size, 1]
-        images, labels = images.to(device), labels.to(device).unsqueeze(1)
+        images = images.to(device)
+        labels = labels.to(device).unsqueeze(1)
 
         # Forward pass: compute model predictions
         outputs = model(images)
@@ -234,22 +225,20 @@ actuals = []
 with (
     torch.no_grad()
 ):  # Disable gradient computation for evaluation (faster, uses less memory)
-    for images, labels in test_loader:
-        images = images.to(device)
-        labels = labels.to(device).unsqueeze(1)
-        outputs = model(images)
+    for test_images, test_labels in test_loader:
+        test_images = test_images.to(device)
+        test_labels = test_labels.to(device).unsqueeze(1)
+        outputs = model(test_images)
 
         predictions.extend(outputs.cpu().numpy())
-        actuals.extend(labels.cpu().numpy())
+        actuals.extend(test_labels.cpu().numpy())
 
 # Convert to flat lists
 predictions = [float(p) for p in predictions]
 actuals = [float(a) for a in actuals]
 
 # Save predictions and actuals to CSV
-import csv
-
-with open("resnet50_test_results.csv", mode="w", newline="") as file:
+with Path("resnet50_test_results.csv").open(mode="w", newline="") as file:
     writer = csv.writer(file)
     writer.writerow(["Actual_BMD", "Predicted_BMD"])
     writer.writerows(zip(actuals, predictions))

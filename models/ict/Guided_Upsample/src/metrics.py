@@ -4,7 +4,7 @@ from torch import nn
 
 class PSNR(nn.Module):
     def __init__(self, max_val):
-        super(PSNR, self).__init__()
+        super().__init__()
 
         base10 = torch.log(torch.tensor(10.0))
         max_val = torch.tensor(max_val).float()

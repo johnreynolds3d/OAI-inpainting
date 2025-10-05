@@ -30,7 +30,7 @@ def test_aot_gan(config_path):
         from test import main_worker
 
         # Parse config
-        with open(config_path) as f:
+        with Path(config_path).open() as f:
             config = yaml.safe_load(f)
 
         # Create args object
@@ -92,7 +92,7 @@ def test_repaint(config_path):
         from test import main
 
         # Parse config
-        with open(config_path) as f:
+        with Path(config_path).open() as f:
             config = yaml.safe_load(f)
 
         # Create config object

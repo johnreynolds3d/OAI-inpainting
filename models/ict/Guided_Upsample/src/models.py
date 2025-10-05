@@ -9,7 +9,7 @@ from .networks import Discriminator, Discriminator2, InpaintGenerator_5
 
 class BaseModel(nn.Module):
     def __init__(self, name, config):
-        super(BaseModel, self).__init__()
+        super().__init__()
 
         self.name = name
         self.config = config
@@ -20,7 +20,7 @@ class BaseModel(nn.Module):
 
     def load(self):
         if os.path.exists(self.gen_weights_path):
-            print("Loading %s generator..." % self.name)
+            print(f"Loading {self.name} generator...")
 
             if torch.cuda.is_available():
                 data = torch.load(self.gen_weights_path)
@@ -36,7 +36,7 @@ class BaseModel(nn.Module):
         if (self.config.MODE == 1 or self.config.score) and os.path.exists(
             self.dis_weights_path
         ):
-            print("Loading %s discriminator..." % self.name)
+            print(f"Loading {self.name} discriminator...")
 
             if torch.cuda.is_available():
                 data = torch.load(self.dis_weights_path)
@@ -48,7 +48,7 @@ class BaseModel(nn.Module):
             self.discriminator.load_state_dict(data["discriminator"])
 
     def save(self):
-        print("\nsaving %s...\n" % self.name)
+        print(f"\nsaving {self.name}...\n")
         torch.save(
             {"iteration": self.iteration, "generator": self.generator.state_dict()},
             self.gen_weights_path,
@@ -61,7 +61,7 @@ class BaseModel(nn.Module):
 
 class InpaintingModel(BaseModel):
     def __init__(self, config):
-        super(InpaintingModel, self).__init__("InpaintingModel", config)
+        super().__init__("InpaintingModel", config)
 
         # generator input: [rgb(3) + edge(1)]
         # discriminator input: [rgb(3)]
@@ -180,11 +180,7 @@ class InpaintingModel(BaseModel):
         images_masked = (images * (1 - masks).float()) + masks
         inputs = torch.cat((images_masked, edges), dim=1)
 
-        if (
-            self.config.Generator == 0
-            or self.config.Generator == 2
-            or self.config.Generator == 4
-        ):
+        if self.config.Generator in {0, 2, 4}:
             outputs = self.generator(inputs)
         else:
             outputs = self.generator(inputs, masks)

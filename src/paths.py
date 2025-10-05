@@ -4,7 +4,7 @@ Ensures reproducibility across different operating systems.
 """
 
 from pathlib import Path
-from typing import List, Union
+from typing import List, Optional, Union
 
 # Project root directory
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -62,28 +62,36 @@ def ensure_dir(path: Union[str, Path]) -> Path:
     return path
 
 
-def get_relative_path(path: Union[str, Path], base: Union[str, Path] = None) -> Path:
+def get_relative_path(
+    path: Union[str, Path], base: Optional[Union[str, Path]] = None
+) -> Path:
     """Get relative path from base directory."""
     if base is None:
         base = PROJECT_ROOT
     return Path(path).relative_to(Path(base))
 
 
-def get_absolute_path(path: Union[str, Path], base: Union[str, Path] = None) -> Path:
+def get_absolute_path(
+    path: Union[str, Path], base: Optional[Union[str, Path]] = None
+) -> Path:
     """Get absolute path from base directory."""
     if base is None:
         base = PROJECT_ROOT
     return Path(base) / path
 
 
-def find_files(pattern: str, directory: Union[str, Path] = None) -> List[Path]:
+def find_files(
+    pattern: str, directory: Optional[Union[str, Path]] = None
+) -> List[Path]:
     """Find files matching pattern in directory."""
     if directory is None:
         directory = PROJECT_ROOT
     return list(Path(directory).glob(pattern))
 
 
-def find_directories(pattern: str, directory: Union[str, Path] = None) -> List[Path]:
+def find_directories(
+    pattern: str, directory: Optional[Union[str, Path]] = None
+) -> List[Path]:
     """Find directories matching pattern in directory."""
     if directory is None:
         directory = PROJECT_ROOT

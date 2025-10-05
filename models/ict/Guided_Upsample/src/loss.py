@@ -13,7 +13,7 @@ class AdversarialLoss(nn.Module):
         r"""
         type = nsgan | lsgan | hinge
         """
-        super(AdversarialLoss, self).__init__()
+        super().__init__()
 
         self.type = type
         self.register_buffer("real_label", torch.tensor(target_real_label))
@@ -53,7 +53,7 @@ class StyleLoss(nn.Module):
     """
 
     def __init__(self):
-        super(StyleLoss, self).__init__()
+        super().__init__()
         self.add_module("vgg", VGG19())
         self.criterion = torch.nn.L1Loss()
 
@@ -95,7 +95,7 @@ class PerceptualLoss(nn.Module):
     """
 
     def __init__(self, weights=[1.0, 1.0, 1.0, 1.0, 1.0]):
-        super(PerceptualLoss, self).__init__()
+        super().__init__()
         self.add_module("vgg", VGG19())
         self.criterion = torch.nn.L1Loss()
         self.weights = weights
@@ -126,7 +126,7 @@ class PerceptualLoss(nn.Module):
 
 class VGG19(torch.nn.Module):
     def __init__(self):
-        super(VGG19, self).__init__()
+        super().__init__()
         features = models.vgg19(pretrained=True).features
         self.relu1_1 = torch.nn.Sequential()
         self.relu1_2 = torch.nn.Sequential()

@@ -36,7 +36,7 @@ def demo(args):
         filename = os.path.basename(fn).split(".")[0]
         orig_img = cv2.resize(cv2.imread(fn, cv2.IMREAD_COLOR), (512, 512))
         img_tensor = (ToTensor()(orig_img) * 2.0 - 1.0).unsqueeze(0)
-        h, w, c = orig_img.shape
+        h, w, _c = orig_img.shape
         mask = np.zeros([h, w, 1], np.uint8)
         image_copy = orig_img.copy()
         sketch = Sketcher(

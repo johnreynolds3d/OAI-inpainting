@@ -24,6 +24,7 @@ Requirements:
 """
 
 import argparse
+import contextlib
 import shutil
 import sys
 from pathlib import Path
@@ -252,7 +253,7 @@ def setup_project_data(
             file_count = get_file_count(op["src"])
             print(f"  {op['name']}: {size_str} ({file_count} files)")
             # Add to total (rough estimate)
-            try:
+            with contextlib.suppress(Exception):
                 total_size += (
                     op["src"].stat().st_size
                     if op["src"].is_file()
@@ -260,8 +261,6 @@ def setup_project_data(
                         f.stat().st_size for f in op["src"].rglob("*") if f.is_file()
                     )
                 )
-            except Exception:
-                pass
     print()
 
     # Check available disk space

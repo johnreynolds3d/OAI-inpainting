@@ -8,7 +8,7 @@ class ZipReader:
     file_dict = {}
 
     def __init__(self):
-        super(ZipReader, self).__init__()
+        super().__init__()
 
     @staticmethod
     def build_file_dict(path):

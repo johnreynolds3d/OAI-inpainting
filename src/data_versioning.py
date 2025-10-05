@@ -24,7 +24,7 @@ class DataVersioning:
         self.version_file = self.version_dir / "data_versions.json"
 
         if self.version_file.exists():
-            with open(self.version_file) as f:
+            with self.version_file.open() as f:
                 self.versions = json.load(f)
         else:
             self.versions = {}
@@ -103,14 +103,14 @@ class DataVersioning:
         hasher = hashlib.sha256()
 
         if data_path.is_file():
-            with open(data_path, "rb") as f:
+            with data_path.open("rb") as f:
                 for chunk in iter(lambda: f.read(4096), b""):
                     hasher.update(chunk)
         elif data_path.is_dir():
             for file_path in sorted(data_path.rglob("*")):
                 if file_path.is_file():
                     hasher.update(str(file_path).encode())
-                    with open(file_path, "rb") as f:
+                    with file_path.open("rb") as f:
                         for chunk in iter(lambda: f.read(4096), b""):
                             hasher.update(chunk)
 
@@ -141,7 +141,7 @@ class DataVersioning:
 
     def _save_versions(self) -> None:
         """Save versions to file."""
-        with open(self.version_file, "w") as f:
+        with self.version_file.open("w") as f:
             json.dump(self.versions, f, indent=2)
 
 
@@ -160,7 +160,7 @@ class DataLineage:
         self.lineage_file = self.lineage_dir / "data_lineage.json"
 
         if self.lineage_file.exists():
-            with open(self.lineage_file) as f:
+            with self.lineage_file.open() as f:
                 self.lineage = json.load(f)
         else:
             self.lineage = {}
@@ -229,5 +229,5 @@ class DataLineage:
 
     def _save_lineage(self) -> None:
         """Save lineage to file."""
-        with open(self.lineage_file, "w") as f:
+        with self.lineage_file.open("w") as f:
             json.dump(self.lineage, f, indent=2)

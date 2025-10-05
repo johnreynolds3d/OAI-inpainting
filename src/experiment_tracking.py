@@ -77,7 +77,7 @@ class ExperimentTracker:
         if self.use_wandb:
             wandb.log(metrics, step=step)
 
-    def log_artifact(self, artifact_path: Path, artifact_type: str = "model") -> None:
+    def log_artifact(self, artifact_path: Path) -> None:
         """Log an artifact."""
         if self.use_mlflow:
             log_artifact(str(artifact_path))
@@ -116,7 +116,7 @@ class ModelRegistry:
         self.registry_file = self.registry_path / "model_registry.json"
 
         if self.registry_file.exists():
-            with open(self.registry_file) as f:
+            with self.registry_file.open() as f:
                 self.registry = json.load(f)
         else:
             self.registry = {}
@@ -196,5 +196,5 @@ class ModelRegistry:
 
     def _save_registry(self) -> None:
         """Save registry to file."""
-        with open(self.registry_file, "w") as f:
+        with self.registry_file.open("w") as f:
             json.dump(self.registry, f, indent=2)

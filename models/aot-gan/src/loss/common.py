@@ -10,7 +10,7 @@ from torchvision import models
 
 class VGG19(nn.Module):
     def __init__(self, resize_input=False):
-        super(VGG19, self).__init__()
+        super().__init__()
         features = models.vgg19(pretrained=True).features
 
         self.resize_input = resize_input
@@ -157,7 +157,7 @@ class GaussianBlur(nn.Module):
     """
 
     def __init__(self, kernel_size, sigma):
-        super(GaussianBlur, self).__init__()
+        super().__init__()
         self.kernel_size = kernel_size
         self.sigma = sigma
         self._padding = self.compute_zero_padding(kernel_size)
@@ -175,7 +175,7 @@ class GaussianBlur(nn.Module):
         if not len(x.shape) == 4:
             raise ValueError(f"Invalid input shape, we expect BxCxHxW. Got: {x.shape}")
         # prepare kernel
-        b, c, h, w = x.shape
+        _b, c, _h, _w = x.shape
         tmp_kernel: torch.Tensor = self.kernel.to(x.device).to(x.dtype)
         kernel: torch.Tensor = tmp_kernel.repeat(c, 1, 1, 1)
 

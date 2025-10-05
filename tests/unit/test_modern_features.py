@@ -14,9 +14,9 @@ class TestExperimentTracker:
 
     def test_experiment_tracker_init(self):
         """Test experiment tracker initialization."""
-        with patch("src.experiment_tracking.wandb") as mock_wandb, patch(
+        with patch("src.experiment_tracking.wandb"), patch(
             "src.experiment_tracking.MlflowClient"
-        ) as mock_mlflow:
+        ):
             tracker = ExperimentTracker(
                 "test_experiment", use_wandb=False, use_mlflow=False
             )

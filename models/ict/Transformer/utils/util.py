@@ -17,7 +17,7 @@ def set_seed(seed):
 
 
 def top_k_logits(logits, k):
-    v, ix = torch.topk(logits, k)
+    v, _ix = torch.topk(logits, k)
     out = logits.clone()
     out[out < v[:, [-1]]] = -float("Inf")
     return out
@@ -27,7 +27,7 @@ def top_k_logits(logits, k):
 def sample(model, x, steps, temperature=1.0, sample=False, top_k=None):
     block_size = model.get_block_size()
     model.eval()
-    for k in range(steps):
+    for _k in range(steps):
         x_cond = (
             x if x.size(1) <= block_size else x[:, -block_size:]
         )  # crop context if needed
@@ -98,10 +98,7 @@ def sample_mask(
 
     model.eval()
     with torch.no_grad():
-        if no_bar:
-            looper = range(length)
-        else:
-            looper = tqdm(range(length), leave=False)
+        looper = range(length) if no_bar else tqdm(range(length), leave=False)
         for i in looper:
             if mask[0, i] == 0:
                 continue
@@ -137,10 +134,7 @@ def sample_mask_all(
     with torch.no_grad():
         logits, _ = model(output, masks=mask)
 
-        if no_bar:
-            looper = range(length)
-        else:
-            looper = tqdm(range(length), leave=False)
+        looper = range(length) if no_bar else tqdm(range(length), leave=False)
         for i in looper:
             if mask[0, i] == 0:
                 continue
@@ -233,7 +227,7 @@ def generate_stroke_mask(
     mask = np.zeros((im_size[0], im_size[1], 1), dtype=np.float32)
     parts = random.randint(5, 13)
     # print(parts)
-    for i in range(parts):
+    for _i in range(parts):
         mask = mask + np_free_form_mask(
             maxVertex, maxLength, maxBrushWidth, maxAngle, im_size[0], im_size[1]
         )

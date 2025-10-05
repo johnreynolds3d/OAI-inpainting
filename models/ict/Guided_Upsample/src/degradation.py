@@ -14,10 +14,7 @@ def pil_to_np(img_PIL):
     """
     ar = np.array(img_PIL)
 
-    if len(ar.shape) == 3:
-        ar = ar.transpose(2, 0, 1)
-    else:
-        ar = ar[None, ...]
+    ar = ar.transpose(2, 0, 1) if len(ar.shape) == 3 else ar[None, ...]
 
     return ar.astype(np.float32) / 255.0
 
@@ -29,10 +26,7 @@ def np_to_pil(img_np):
     """
     ar = np.clip(img_np * 255, 0, 255).astype(np.uint8)
 
-    if img_np.shape[0] == 1:
-        ar = ar[0]
-    else:
-        ar = ar.transpose(1, 2, 0)
+    ar = ar[0] if img_np.shape[0] == 1 else ar.transpose(1, 2, 0)
 
     return Image.fromarray(ar)
 

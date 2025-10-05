@@ -112,7 +112,6 @@ def main(conf: conf_mgt.Default_Conf):
         return model(x, t, y if conf.class_cond else None, gt=gt)
 
     print("sampling...")
-    all_images = []
 
     dset = "eval"
 
@@ -121,7 +120,7 @@ def main(conf: conf_mgt.Default_Conf):
     dl = conf.get_dataloader(dset=dset, dsName=eval_name)
 
     for batch in iter(dl):
-        for k in batch.keys():
+        for k in batch:
             if isinstance(batch[k], th.Tensor):
                 batch[k] = batch[k].to(device)
 

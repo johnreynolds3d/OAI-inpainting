@@ -17,7 +17,7 @@ class L1:
 
 class Perceptual(nn.Module):
     def __init__(self, weights=[1.0, 1.0, 1.0, 1.0, 1.0]):
-        super(Perceptual, self).__init__()
+        super().__init__()
         self.vgg = VGG19().cuda()
         self.criterion = torch.nn.L1Loss()
         self.weights = weights
@@ -35,7 +35,7 @@ class Perceptual(nn.Module):
 
 class Style(nn.Module):
     def __init__(self):
-        super(Style, self).__init__()
+        super().__init__()
         self.vgg = VGG19().cuda()
         self.criterion = torch.nn.L1Loss()
 
@@ -90,7 +90,7 @@ class smgan:
         d_real = netD(real)
 
         _, _, h, w = g_fake.size()
-        b, c, ht, wt = masks.size()
+        _b, _c, ht, wt = masks.size()
 
         # Handle inconsistent size between outputs and masks
         if h != ht or w != wt:

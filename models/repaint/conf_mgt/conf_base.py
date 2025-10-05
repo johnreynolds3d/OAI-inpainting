@@ -106,7 +106,7 @@ class Default_Conf(NoneDict):
         if dset is None:
             dset = self.get_default_eval_name()
 
-        max_len = self["data"][dset][name].get("max_len")
+        self["data"][dset][name].get("max_len")
 
         if srs is not None:
             sr_dir_path = expanduser(self["data"][dset][name]["paths"]["srs"])
@@ -133,19 +133,16 @@ class Default_Conf(NoneDict):
             raise RuntimeError(
                 f"Need exactly one candidate for {self.name}: {candidates}"
             )
-        return list(candidates)[0]
+        return next(iter(candidates))
 
     def pget(self, name, default=None):
-        if "." in name:
-            names = name.split(".")
-        else:
-            names = [name]
+        names = name.split(".") if "." in name else [name]
 
         sub_dict = self
         for name in names:
             sub_dict = sub_dict.get(name, default)
 
-            if sub_dict == None:
+            if sub_dict is None:
                 return default
 
         return sub_dict

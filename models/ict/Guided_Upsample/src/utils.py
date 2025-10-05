@@ -165,10 +165,7 @@ class Progbar:
             self._total_width = len(bar)
             sys.stdout.write(bar)
 
-            if current:
-                time_per_unit = (now - self._start) / current
-            else:
-                time_per_unit = 0
+            time_per_unit = (now - self._start) / current if current else 0
             if self.target is not None and current < self.target:
                 eta = time_per_unit * (self.target - current)
                 if eta > 3600:
@@ -182,24 +179,24 @@ class Progbar:
                 else:
                     eta_format = "%ds" % eta
 
-                info = " - ETA: %s" % eta_format
+                info = f" - ETA: {eta_format}"
             elif time_per_unit >= 1:
-                info += " %.0fs/step" % time_per_unit
+                info += f" {time_per_unit:.0f}s/step"
             elif time_per_unit >= 1e-3:
                 info += " %.0fms/step" % (time_per_unit * 1e3)
             else:
                 info += " %.0fus/step" % (time_per_unit * 1e6)
 
             for k in self._values_order:
-                info += " - %s:" % k
+                info += f" - {k}:"
                 if isinstance(self._values[k], list):
                     avg = np.mean(self._values[k][0] / max(1, self._values[k][1]))
                     if abs(avg) > 1e-3:
-                        info += " %.4f" % avg
+                        info += f" {avg:.4f}"
                     else:
-                        info += " %.4e" % avg
+                        info += f" {avg:.4e}"
                 else:
-                    info += " %s" % self._values[k]
+                    info += f" {self._values[k]}"
 
             self._total_width += len(info)
             if prev_total_width > self._total_width:
@@ -214,12 +211,12 @@ class Progbar:
         elif self.verbose == 2:
             if self.target is None or current >= self.target:
                 for k in self._values_order:
-                    info += " - %s:" % k
+                    info += f" - {k}:"
                     avg = np.mean(self._values[k][0] / max(1, self._values[k][1]))
                     if avg > 1e-3:
-                        info += " %.4f" % avg
+                        info += f" {avg:.4f}"
                     else:
-                        info += " %.4e" % avg
+                        info += f" {avg:.4e}"
                 info += "\n"
 
                 sys.stdout.write(info)

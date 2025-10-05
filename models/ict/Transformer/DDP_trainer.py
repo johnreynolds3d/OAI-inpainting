@@ -150,7 +150,7 @@ class Trainer:
                         if self.config.BERT:
                             logits, loss = model(x, x, y)
                         else:
-                            logits, loss = model(x, y)
+                            _logits, loss = model(x, y)
                         loss = (
                             loss.mean()
                         )  # collapse all losses if they are scattered on multiple gpus

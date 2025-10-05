@@ -184,7 +184,7 @@ class ConfigManager:
         """
         config_path = self.config_dir / f"{config_name}.yaml"
 
-        with open(config_path, "w") as f:
+        with Path(config_path).open("w") as f:
             yaml.dump(config.dict(), f, default_flow_style=False, indent=2)
 
         return config_path
@@ -278,7 +278,7 @@ def load_config_from_file(config_path: Union[str, Path]) -> Config:
     if not config_path.exists():
         raise FileNotFoundError(f"Configuration file not found: {config_path}")
 
-    with open(config_path) as f:
+    with Path(config_path).open() as f:
         config_dict = yaml.safe_load(f)
 
     return Config(**config_dict)

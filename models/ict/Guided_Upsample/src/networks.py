@@ -4,7 +4,7 @@ from torch import nn
 
 class BaseNetwork(nn.Module):
     def __init__(self):
-        super(BaseNetwork, self).__init__()
+        super().__init__()
 
     def init_weights(self, init_type="normal", gain=0.02):
         """
@@ -39,7 +39,7 @@ class BaseNetwork(nn.Module):
 
 class InpaintGenerator_5(BaseNetwork):
     def __init__(self, residual_blocks=8, init_weights=True):
-        super(InpaintGenerator_5, self).__init__()
+        super().__init__()
 
         self.encoder = nn.Sequential(
             nn.ReflectionPad2d(3),
@@ -96,7 +96,7 @@ class Discriminator(BaseNetwork):
     def __init__(
         self, in_channels, use_sigmoid=True, use_spectral_norm=True, init_weights=True
     ):
-        super(Discriminator, self).__init__()
+        super().__init__()
         self.use_sigmoid = use_sigmoid
 
         self.conv1 = self.features = nn.Sequential(
@@ -192,7 +192,7 @@ class Discriminator(BaseNetwork):
 
 class ResnetBlock(nn.Module):
     def __init__(self, dim, dilation=1, use_spectral_norm=False):
-        super(ResnetBlock, self).__init__()
+        super().__init__()
         self.conv_block = nn.Sequential(
             nn.ReflectionPad2d(dilation),
             spectral_norm(
@@ -234,7 +234,7 @@ class ResnetBlock(nn.Module):
 
 class ResnetBlock_remove_IN(nn.Module):
     def __init__(self, dim, dilation=1, use_spectral_norm=False):
-        super(ResnetBlock_remove_IN, self).__init__()
+        super().__init__()
         self.conv_block = nn.Sequential(
             nn.ReflectionPad2d(dilation),
             spectral_norm(
@@ -283,7 +283,7 @@ class Discriminator2(BaseNetwork):  ## use reflection padding
     def __init__(
         self, in_channels, use_sigmoid=True, use_spectral_norm=True, init_weights=True
     ):
-        super(Discriminator2, self).__init__()
+        super().__init__()
         self.use_sigmoid = use_sigmoid
 
         self.conv1 = self.features = nn.Sequential(

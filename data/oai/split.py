@@ -346,7 +346,7 @@ def create_balanced_splits():
         return successful, failed
 
     # Generate masks and edge maps for each split
-    train_mask_success, train_mask_failed = generate_masks_for_split(
+    train_mask_success, _train_mask_failed = generate_masks_for_split(
         train_df,
         "train",
         os.path.join(script_dir, "train/img"),
@@ -354,7 +354,7 @@ def create_balanced_splits():
         os.path.join(script_dir, "train/mask_inv"),
         os.path.join(script_dir, "train/edge"),
     )
-    val_mask_success, val_mask_failed = generate_masks_for_split(
+    val_mask_success, _val_mask_failed = generate_masks_for_split(
         val_df,
         "validation",
         os.path.join(script_dir, "valid/img"),
@@ -362,7 +362,7 @@ def create_balanced_splits():
         os.path.join(script_dir, "valid/mask_inv"),
         os.path.join(script_dir, "valid/edge"),
     )
-    test_mask_success, test_mask_failed = generate_masks_for_split(
+    test_mask_success, _test_mask_failed = generate_masks_for_split(
         test_df,
         "test",
         os.path.join(script_dir, "test/img"),

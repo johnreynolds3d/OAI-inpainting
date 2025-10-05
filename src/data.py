@@ -55,7 +55,7 @@ class OAIDataset(Dataset):
             self.edge_dir = self.data_dir / split / "edge"
 
         # Load image paths
-        self.image_paths = sorted(list(self.img_dir.glob("*.png")))
+        self.image_paths = sorted(self.img_dir.glob("*.png"))
 
         if not self.image_paths:
             raise ValueError(f"No images found in {self.img_dir}")
@@ -324,7 +324,7 @@ def create_subset_info(data_dir: Union[str, Path], subset: str = "subset_4") -> 
         return
 
     # Get image files
-    image_files = sorted(list(subset_dir.glob("*.png")))
+    image_files = sorted(subset_dir.glob("*.png"))
 
     # Create info DataFrame
     info_data = []

@@ -23,25 +23,25 @@ class BaseConfig:
 
     def to_yaml(self, path: Union[str, Path]) -> None:
         """Save config to YAML file."""
-        with open(path, "w") as f:
+        with Path(path).open("w") as f:
             yaml.dump(self.to_dict(), f, default_flow_style=False, indent=2)
 
     def to_json(self, path: Union[str, Path]) -> None:
         """Save config to JSON file."""
-        with open(path, "w") as f:
+        with Path(path).open("w") as f:
             json.dump(self.to_dict(), f, indent=2)
 
     @classmethod
     def from_yaml(cls, path: Union[str, Path]) -> "BaseConfig":
         """Load config from YAML file."""
-        with open(path) as f:
+        with Path(path).open() as f:
             data = yaml.safe_load(f)
         return cls(**data)
 
     @classmethod
     def from_json(cls, path: Union[str, Path]) -> "BaseConfig":
         """Load config from JSON file."""
-        with open(path) as f:
+        with Path(path).open() as f:
             data = json.load(f)
         return cls(**data)
 
@@ -162,7 +162,7 @@ def load_config(
         raise FileNotFoundError(f"Configuration file not found: {config_path}")
 
     # Load configuration data
-    with open(config_path) as f:
+    with Path(config_path).open() as f:
         if (
             config_path.suffix.lower() == ".yaml"
             or config_path.suffix.lower() == ".yml"

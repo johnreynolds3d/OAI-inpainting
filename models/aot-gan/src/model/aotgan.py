@@ -8,7 +8,7 @@ from .common import BaseNetwork
 
 class InpaintGenerator(BaseNetwork):
     def __init__(self, args):  # 1046
-        super(InpaintGenerator, self).__init__()
+        super().__init__()
 
         self.encoder = nn.Sequential(
             nn.ReflectionPad2d(3),
@@ -45,7 +45,7 @@ class InpaintGenerator(BaseNetwork):
 
 class UpConv(nn.Module):
     def __init__(self, inc, outc, scale=2):
-        super(UpConv, self).__init__()
+        super().__init__()
         self.scale = scale
         self.conv = nn.Conv2d(inc, outc, 3, stride=1, padding=1)
 
@@ -57,7 +57,7 @@ class UpConv(nn.Module):
 
 class AOTBlock(nn.Module):
     def __init__(self, dim, rates):
-        super(AOTBlock, self).__init__()
+        super().__init__()
         self.rates = rates
         for i, rate in enumerate(rates):
             self.__setattr__(
@@ -100,7 +100,7 @@ class Discriminator(BaseNetwork):
     def __init__(
         self,
     ):
-        super(Discriminator, self).__init__()
+        super().__init__()
         inc = 3
         self.conv = nn.Sequential(
             spectral_norm(nn.Conv2d(inc, 64, 4, stride=2, padding=1, bias=False)),

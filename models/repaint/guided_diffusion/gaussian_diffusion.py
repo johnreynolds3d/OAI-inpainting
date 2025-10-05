@@ -43,10 +43,7 @@ def get_named_beta_schedule(schedule_name, num_diffusion_timesteps, use_scale):
         # Linear schedule from Ho et al, extended to work for any number of
         # diffusion steps.
 
-        if use_scale:
-            scale = 1000 / num_diffusion_timesteps
-        else:
-            scale = 1
+        scale = 1000 / num_diffusion_timesteps if use_scale else 1
 
         beta_start = scale * 0.0001
         beta_end = scale * 0.02
@@ -88,7 +85,7 @@ class LossType(enum.Enum):
     RESCALED_KL = enum.auto()  # like KL, but rescale to estimate the full VLB
 
     def is_vb(self):
-        return self == LossType.KL or self == LossType.RESCALED_KL
+        return self in (LossType.KL, LossType.RESCALED_KL)
 
 
 class GaussianDiffusion:
@@ -339,28 +336,27 @@ class GaussianDiffusion:
         """
         noise = th.randn_like(x)
 
-        if conf.inpa_inj_sched_prev:
-            if pred_xstart is not None:
-                gt_keep_mask = model_kwargs.get("gt_keep_mask")
-                if gt_keep_mask is None:
-                    gt_keep_mask = conf.get_inpa_mask(x)
+        if conf.inpa_inj_sched_prev and pred_xstart is not None:
+            gt_keep_mask = model_kwargs.get("gt_keep_mask")
+            if gt_keep_mask is None:
+                gt_keep_mask = conf.get_inpa_mask(x)
 
-                gt = model_kwargs["gt"]
+            gt = model_kwargs["gt"]
 
-                alpha_cumprod = _extract_into_tensor(self.alphas_cumprod, t, x.shape)
+            alpha_cumprod = _extract_into_tensor(self.alphas_cumprod, t, x.shape)
 
-                if conf.inpa_inj_sched_prev_cumnoise:
-                    weighed_gt = self.get_gt_noised(gt, int(t[0].item()))
-                else:
-                    gt_weight = th.sqrt(alpha_cumprod)
-                    gt_part = gt_weight * gt
+            if conf.inpa_inj_sched_prev_cumnoise:
+                weighed_gt = self.get_gt_noised(gt, int(t[0].item()))
+            else:
+                gt_weight = th.sqrt(alpha_cumprod)
+                gt_part = gt_weight * gt
 
-                    noise_weight = th.sqrt(1 - alpha_cumprod)
-                    noise_part = noise_weight * th.randn_like(x)
+                noise_weight = th.sqrt(1 - alpha_cumprod)
+                noise_part = noise_weight * th.randn_like(x)
 
-                    weighed_gt = gt_part + noise_part
+                weighed_gt = gt_part + noise_part
 
-                x = gt_keep_mask * (weighed_gt) + (1 - gt_keep_mask) * (x)
+            x = gt_keep_mask * (weighed_gt) + (1 - gt_keep_mask) * (x)
 
         out = self.p_mean_variance(
             model,
@@ -470,7 +466,7 @@ class GaussianDiffusion:
         else:
             image_after_step = th.randn(*shape, device=device)
 
-        debug_steps = conf.pget("debug.num_timesteps")
+        conf.pget("debug.num_timesteps")
 
         self.gt_noises = None  # reset for next image
 

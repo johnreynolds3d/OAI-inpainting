@@ -18,12 +18,11 @@ def read_img(img_url, image_size, is_train):
     img = Image.open(img_url).convert("RGB")
 
     x, y = img.size
-    if x != y:
-        if is_train:
-            matrix_length = min(x, y)
-            x1 = randrange(0, x - matrix_length + 1)
-            y1 = randrange(0, y - matrix_length + 1)
-            img = img.crop((x1, y1, x1 + matrix_length, y1 + matrix_length))
+    if x != y and is_train:
+        matrix_length = min(x, y)
+        x1 = randrange(0, x - matrix_length + 1)
+        y1 = randrange(0, y - matrix_length + 1)
+        img = img.crop((x1, y1, x1 + matrix_length, y1 + matrix_length))
 
     if random.random() > 0.5 and is_train:
         img = img.transpose(Image.FLIP_LEFT_RIGHT)
@@ -34,9 +33,9 @@ def read_img(img_url, image_size, is_train):
 
 def getfilelist(path):
     all_file = []
-    for dir, folder, file in os.walk(path):
+    for dir, _folder, file in os.walk(path):
         for i in file:
-            t = "%s/%s" % (dir, i)
+            t = f"{dir}/{i}"
             all_file.append(t)
     return all_file
 
@@ -70,7 +69,7 @@ class ImageNetDatasetMask(Dataset):
         else:
             dset_tmp = dset.ImageFolder(root=self.pt_dataset)
             url_label = dset_tmp.imgs
-            for x, y in url_label:
+            for x, _y in url_label:
                 self.image_id_list.append(x)
 
         self.random_stroke = random_stroke

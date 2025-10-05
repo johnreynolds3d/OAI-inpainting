@@ -164,7 +164,7 @@ test_batch_size: 1
     checkpoint_dir.mkdir(exist_ok=True)
 
     config_path = checkpoint_dir / "config.yml"
-    with open(config_path, "w") as f:
+    with config_path.open("w") as f:
         f.write(config_content)
 
     # Run ICT test
@@ -321,7 +321,7 @@ data:
         / "repaint"
         / f"subset_4_{model_name.lower().replace('-', '_')}_config.yml"
     )
-    with open(config_path, "w") as f:
+    with config_path.open("w") as f:
         f.write(config_content)
 
     # Run RePaint test

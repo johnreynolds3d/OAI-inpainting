@@ -113,7 +113,7 @@ class Guided_Upsampler:
 
                 if model == 2:
                     # train
-                    outputs, gen_loss, dis_loss, logs = self.inpaint_model.process(
+                    outputs, _gen_loss, _dis_loss, logs = self.inpaint_model.process(
                         images, edges, masks
                     )
                     outputs_merged = (outputs * masks) + (images * (1 - masks))
@@ -137,10 +137,7 @@ class Guided_Upsampler:
                     keep_training = False
                     break
 
-                logs = [
-                    ("epoch", epoch),
-                    ("iter", iteration),
-                ] + logs
+                logs = [("epoch", epoch), ("iter", iteration), *logs]
 
                 if self.config.No_Bar:
                     pass
@@ -211,7 +208,7 @@ class Guided_Upsampler:
             # inpaint model
             if model == 2:
                 # eval
-                outputs, gen_loss, dis_loss, logs = self.inpaint_model.process(
+                outputs, _gen_loss, _dis_loss, logs = self.inpaint_model.process(
                     images, edges, masks
                 )
                 outputs_merged = (outputs * masks) + (images * (1 - masks))
@@ -226,9 +223,7 @@ class Guided_Upsampler:
                 logs.append(("psnr", psnr.item()))
                 logs.append(("mae", mae.item()))
 
-            logs = [
-                ("it", iteration),
-            ] + logs
+            logs = [("it", iteration), *logs]
             if self.config.No_Bar:
                 pass
             else:
@@ -340,7 +335,7 @@ class Guided_Upsampler:
 
     def log(self, logs):
         with open(self.log_file, "a") as f:
-            f.write("%s\n" % " ".join([str(item[1]) for item in logs]))
+            f.write("{}\n".format(" ".join([str(item[1]) for item in logs])))
 
     def cuda(self, *args):
         return (item.to(self.config.DEVICE) for item in args)

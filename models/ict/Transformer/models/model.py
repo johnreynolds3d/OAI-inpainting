@@ -194,8 +194,8 @@ class GPT(nn.Module):
         whitelist_weight_modules = (torch.nn.Linear,)
         blacklist_weight_modules = (torch.nn.LayerNorm, torch.nn.Embedding)
         for mn, m in self.named_modules():
-            for pn, p in m.named_parameters():
-                fpn = "%s.%s" % (mn, pn) if mn else pn  # full param name
+            for pn, _p in m.named_parameters():
+                fpn = f"{mn}.{pn}" if mn else pn  # full param name
 
                 if pn.endswith("bias"):
                     # all biases will not be decayed
@@ -213,26 +213,24 @@ class GPT(nn.Module):
             no_decay.add("sos")
 
         # validate that we considered every parameter
-        param_dict = {pn: p for pn, p in self.named_parameters()}
+        param_dict = dict(self.named_parameters())
         inter_params = decay & no_decay
         union_params = decay | no_decay
         assert len(inter_params) == 0, (
-            "parameters %s made it into both decay/no_decay sets!"
-            % (str(inter_params),)
+            f"parameters {inter_params!s} made it into both decay/no_decay sets!"
         )
         assert len(param_dict.keys() - union_params) == 0, (
-            "parameters %s were not separated into either decay/no_decay set!"
-            % (str(param_dict.keys() - union_params),)
+            f"parameters {param_dict.keys() - union_params!s} were not separated into either decay/no_decay set!"
         )
 
         # create the pytorch optimizer object
         optim_groups = [
             {
-                "params": [param_dict[pn] for pn in sorted(list(decay))],
+                "params": [param_dict[pn] for pn in sorted(decay)],
                 "weight_decay": train_config.weight_decay,
             },
             {
-                "params": [param_dict[pn] for pn in sorted(list(no_decay))],
+                "params": [param_dict[pn] for pn in sorted(no_decay)],
                 "weight_decay": 0.0,
             },
         ]

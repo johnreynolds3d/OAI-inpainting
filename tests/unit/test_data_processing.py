@@ -54,9 +54,9 @@ def test_subset_4_info_csv(subset_4_data):
 
 def test_subset_4_filename_consistency(subset_4_data):
     """Test that image, mask, and edge filenames are consistent."""
-    image_files = set(f.stem for f in subset_4_data["images"].glob("*.png"))
-    mask_files = set(f.stem for f in subset_4_data["masks"].glob("*.png"))
-    edge_files = set(f.stem for f in subset_4_data["edges"].glob("*.png"))
+    image_files = {f.stem for f in subset_4_data["images"].glob("*.png")}
+    mask_files = {f.stem for f in subset_4_data["masks"].glob("*.png")}
+    edge_files = {f.stem for f in subset_4_data["edges"].glob("*.png")}
 
     assert image_files == mask_files, "Image and mask filenames don't match"
     assert image_files == edge_files, "Image and edge filenames don't match"

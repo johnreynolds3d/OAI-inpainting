@@ -33,10 +33,7 @@ def calculate_inpainting_metrics(gt_images, inpainted_images, masks):
 
     # Calculate PSNR
     mse = np.mean((gt - inpainted) ** 2)
-    if mse == 0:
-        psnr = float("inf")
-    else:
-        psnr = 20 * np.log10(1.0 / np.sqrt(mse))
+    psnr = float("inf") if mse == 0 else 20 * np.log10(1.0 / np.sqrt(mse))
 
     # Calculate SSIM (simplified version)
     def ssim(img1, img2):

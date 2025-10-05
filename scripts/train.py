@@ -29,7 +29,7 @@ def train_aot_gan(config_path):
     from train import main_worker
 
     # Parse config
-    with open(config_path) as f:
+    with Path(config_path).open() as f:
         config = yaml.safe_load(f)
 
     # Create args object
@@ -51,7 +51,7 @@ def train_aot_gan(config_path):
         main_worker(0, 1, args)
 
 
-def train_ict(config_path):
+def train_ict(config_path):  # noqa: ARG001
     """Train ICT model."""
     print("🚀 Training ICT...")
 
@@ -65,7 +65,7 @@ def train_ict(config_path):
     main(mode=1)  # Training mode
 
 
-def train_repaint(config_path):
+def train_repaint(config_path):  # noqa: ARG001
     """Train RePaint model (note: RePaint is inference-only)."""
     print("⚠️  RePaint is inference-only. Use test.py for inference.")
 
