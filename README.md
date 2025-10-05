@@ -21,7 +21,8 @@ OAI-inpainting/
 ├── scripts/                     # Unified training/testing scripts
 │   ├── train.py
 │   ├── test.py
-│   └── evaluate.py
+│   ├── evaluate.py
+│   └── setup_data.py           # Data setup script
 ├── utils/                       # Shared utilities
 │   ├── paths.py
 │   ├── config.py
@@ -66,6 +67,51 @@ pip install -r requirements-dev.txt
 pre-commit install
 ```
 
+### Data Setup
+
+The project requires additional untracked data files (images and pretrained models). Use the automated setup script:
+
+```bash
+# Auto-detect and set up data (recommended)
+python scripts/setup_data.py
+
+# Preview what would be copied (dry run)
+python scripts/setup_data.py --dry-run
+
+# Specify custom source directory
+python scripts/setup_data.py --source-dir /path/to/OAI_untracked
+
+# Force overwrite existing files
+python scripts/setup_data.py --force
+```
+
+**Required Untracked Data Structure:**
+```
+OAI_untracked/                    # Can be named differently
+├── data/
+│   ├── oai/
+│   │   └── img/                  # OAI X-ray images (required)
+│   │       ├── 6.C.1_*.png
+│   │       └── 6.E.1_*.png
+│   └── pretrained/               # Pretrained models (optional)
+│       ├── aot-gan/
+│       ├── ict/
+│       └── repaint/
+```
+
+**Data Requirements:**
+- **OAI Images**: 539 PNG files (~11.6 MB) - Required
+- **AOT-GAN Models**: 8 files (~411 MB) - Optional
+- **ICT Models**: 15 files (~8.3 GB) - Optional
+- **RePaint Models**: 4 files (~6.4 GB) - Optional
+
+**Setup Script Features:**
+- Auto-detects untracked data directories in common locations
+- Validates data structure and estimates sizes
+- Supports dry-run mode for previewing operations
+- Handles missing optional components gracefully
+- Provides detailed progress tracking and error messages
+
 ### Training
 
 ```bash
@@ -98,17 +144,34 @@ python scripts/evaluate.py --models aot-gan ict repaint --subset subset_4
 
 The project uses the OAI (Osteoarthritis Initiative) X-ray dataset:
 
-- **Ground truth images**: `data/oai/gt_img/`
+- **Ground truth images**: `data/oai/img/` (populated by setup script)
 - **Balanced splits**: Train/validation/test with class balance
 - **Multiple mask types**: Random squares, inverted masks, edge maps
 - **Evaluation subset**: `subset_4` with 2 osteoporotic + 2 normal images
 
 ### Dataset Generation
 
+After running the setup script, generate the dataset splits:
+
 ```bash
 cd data/oai
 python split.py  # Generates balanced splits and masks
 ```
+
+### Troubleshooting Data Setup
+
+**"Could not find untracked data directory"**
+- Use `--source-dir` to specify the exact path: `python scripts/setup_data.py --source-dir /path/to/OAI_untracked`
+
+**"Some required components are missing"**
+- Ensure your untracked data has the correct structure (see Data Setup section above)
+
+**"Insufficient disk space"**
+- Check available space: `df -h`
+- Clean up unnecessary files or use `--force` to proceed anyway
+
+**"Permission denied"**
+- Fix permissions: `chmod -R 755 .`
 
 ## 🔧 Configuration
 
