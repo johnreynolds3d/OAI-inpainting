@@ -424,7 +424,7 @@ def create_subset_4(test_df, script_dir):
     subset_4_dirs = [
         os.path.join(script_dir, "test/img/subset_4"),
         os.path.join(script_dir, "test/mask/subset_4"),
-        os.path.join(script_dir, "test/mask/inv/subset_4"),
+        os.path.join(script_dir, "test/mask_inv/subset_4"),
         os.path.join(script_dir, "test/edge/subset_4"),
     ]
 
@@ -453,13 +453,13 @@ def create_subset_4(test_df, script_dir):
         # Source paths
         src_img = os.path.join(script_dir, "test/img", filename)
         src_mask = os.path.join(script_dir, "test/mask", mask_filename)
-        src_mask_inv = os.path.join(script_dir, "test/mask/inv", mask_filename)
+        src_mask_inv = os.path.join(script_dir, "test/mask_inv", mask_filename)
         src_edge = os.path.join(script_dir, "test/edge", mask_filename)
 
         # Destination paths
         dst_img = os.path.join(script_dir, "test/img/subset_4", filename)
         dst_mask = os.path.join(script_dir, "test/mask/subset_4", mask_filename)
-        dst_mask_inv = os.path.join(script_dir, "test/mask/inv/subset_4", mask_filename)
+        dst_mask_inv = os.path.join(script_dir, "test/mask_inv/subset_4", mask_filename)
         dst_edge = os.path.join(script_dir, "test/edge/subset_4", mask_filename)
 
         # Copy files
