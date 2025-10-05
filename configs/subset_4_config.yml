@@ -1,0 +1,29 @@
+# AOT-GAN Configuration for OAI Subset_4
+data:
+  test_images: "./data/oai/test/img/subset_4"
+  test_masks: "./data/oai/test/mask/subset_4"
+
+model:
+  name: "aotgan"
+  block_num: 8
+  rates: "1+2+4+8"
+  gan_type: "smgan"
+
+# Hardware configuration
+hardware:
+  distributed: false
+  local_rank: 0
+  tensorboard: false
+
+# Paths
+paths:
+  save_dir: "./results/logs/aot-gan/subset_4"
+  outputs: "./output/AOT-GAN/OAI/subset_4"
+  resume: "/var/home/john/Documents/Code/OAI-inpainting/data/pretrained/aot-gan/places2"
+
+# Loss configuration
+loss:
+  rec_loss:
+    l1: 1.0
+    style: 1.0
+    perceptual: 1.0

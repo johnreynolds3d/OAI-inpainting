@@ -1,0 +1,50 @@
+# Model checkpoints and experiments
+# Track directory structure but ignore large model files
+data/pretrained/**/*.pth
+data/pretrained/**/*.pt
+models/**/*.pth
+models/**/*.pt
+ICT/ckpts_ICT/
+output/
+
+# OAI images
+# Track directory structure but ignore image files
+data/oai/**/*.png
+data/oai/**/*.jpg
+data/oai/**/*.jpeg
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Environment and IDE files
+.env
+.venv
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Model-specific temporary files
+checkpoints/
+results/
+logs/

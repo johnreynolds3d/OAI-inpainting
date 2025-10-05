@@ -1,0 +1,22 @@
+MODE: 2
+MODEL: 2
+MASK: 3
+EDGE: 1
+NMS: 1
+SEED: 10
+GPU: [0]
+DEBUG: 0
+VERBOSE: 0
+
+Generator: 0
+No_Bar: True
+
+TEST_FLIST: /var/home/john/Documents/Code/OAI-inpainting/data/oai/test/img/subset_4
+TEST_EDGE_FLIST: /var/home/john/Documents/Code/OAI-inpainting/data/oai/test/edge/subset_4
+TEST_MASK_FLIST: /var/home/john/Documents/Code/OAI-inpainting/data/oai/test/mask/subset_4
+
+PATH: /var/home/john/Documents/Code/OAI-inpainting/data/pretrained/ict/Upsample/Places2_Nature
+RESULTS: /var/home/john/Documents/Code/OAI-inpainting/output/ICT/OAI/subset_4
+
+BATCH_SIZE: 1
+INPUT_SIZE: 256

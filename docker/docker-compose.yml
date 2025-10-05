@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  oai-inpainting:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: development
+    volumes:
+      - ../data:/app/data
+      - ../results:/app/results
+      - ../configs:/app/configs
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - WANDB_PROJECT=oai-inpainting
+    ports:
+      - "8080:8080"  # For Jupyter/TensorBoard
+    command: bash
+
+  jupyter:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: development
+    volumes:
+      - ../data:/app/data
+      - ../results:/app/results
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    ports:
+      - "8888:8888"
+    command: jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root
+
+  tensorboard:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: development
+    volumes:
+      - ../results/logs:/app/results/logs
+    ports:
+      - "6006:6006"
+    command: tensorboard --logdir=results/logs --host=0.0.0.0 --port=6006

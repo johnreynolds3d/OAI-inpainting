@@ -1,0 +1,32 @@
+# Core dependencies (from backup analysis)
+future>=0.16.0
+matplotlib>=2.2.2
+mypy>=0.950
+numpy>=1.14.3
+opencv-python>=3.4.0
+pillow>=6.2.0
+
+# Development dependencies
+pre-commit>=6.0.0
+pyaml
+
+# Testing dependencies
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-mock>=3.10.0
+
+# Code quality dependencies
+ruff>=0.13.0
+
+# Core dependencies
+scikit-image>=0.14.0
+scipy>=1.0.1
+tensorboard
+
+# PyTorch (add specific version based on your setup)
+torch
+torchvision
+
+# Additional common ML dependencies
+tqdm
+wandb

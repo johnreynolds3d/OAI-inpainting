@@ -1,0 +1,157 @@
+#!/usr/bin/env python3
+"""
+Unified testing script for all inpainting models on OAI dataset.
+Platform-agnostic and reproducible.
+"""
+
+import argparse
+import os
+import sys
+from pathlib import Path
+
+import yaml
+
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+
+def test_aot_gan(config_path):
+    """Test AOT-GAN model."""
+    print("🧪 Testing AOT-GAN...")
+
+    # Change to AOT-GAN directory
+    aot_gan_dir = project_root / "models" / "aot-gan" / "src"
+    original_dir = os.getcwd()
+    os.chdir(aot_gan_dir)
+
+    try:
+        # Import and run testing
+        from test import main_worker
+
+        # Parse config
+        with open(config_path) as f:
+            config = yaml.safe_load(f)
+
+        # Create args object
+        class Args:
+            def __init__(self, config):
+                # Set default values
+                self.model = "aotgan"
+                self.pre_train = None
+                self.dir_image = None
+                self.dir_mask = None
+                self.outputs = None
+
+                # Override with config values
+                for key, value in config.items():
+                    if isinstance(value, dict):
+                        for subkey, subvalue in value.items():
+                            setattr(self, subkey, subvalue)
+                    else:
+                        setattr(self, key, value)
+
+        args = Args(config)
+
+        # Run testing
+        main_worker(args, use_gpu=True)
+    finally:
+        os.chdir(original_dir)
+
+
+def test_ict(config_path):
+    """Test ICT model."""
+    print("🧪 Testing ICT...")
+
+    # Change to ICT directory
+    ict_dir = project_root / "models" / "ict" / "Guided_Upsample"
+    original_dir = os.getcwd()
+    os.chdir(ict_dir)
+
+    try:
+        # Import and run testing
+        from main import main
+
+        main(mode=2)  # Testing mode
+    finally:
+        os.chdir(original_dir)
+
+
+def test_repaint(config_path):
+    """Test RePaint model."""
+    print("🧪 Testing RePaint...")
+
+    # Change to RePaint directory
+    repaint_dir = project_root / "models" / "repaint"
+    original_dir = os.getcwd()
+    os.chdir(repaint_dir)
+
+    try:
+        # Import and run testing
+        from conf_mgt.conf_base import Default_Conf
+        from test import main
+
+        # Parse config
+        with open(config_path) as f:
+            config = yaml.safe_load(f)
+
+        # Create config object
+        conf = Default_Conf()
+        for key, value in config.items():
+            if isinstance(value, dict):
+                for subkey, subvalue in value.items():
+                    setattr(conf, subkey, subvalue)
+            else:
+                setattr(conf, key, value)
+
+        # Run testing
+        main(conf)
+    finally:
+        os.chdir(original_dir)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Test inpainting models on OAI dataset"
+    )
+    parser.add_argument(
+        "--model",
+        choices=["aot-gan", "ict", "repaint"],
+        required=True,
+        help="Model to test",
+    )
+    parser.add_argument(
+        "--config", type=str, required=True, help="Path to configuration file"
+    )
+    parser.add_argument(
+        "--subset",
+        type=str,
+        default="test",
+        help="Dataset subset to test on (test, subset_4)",
+    )
+
+    args = parser.parse_args()
+
+    # Validate config file exists
+    config_path = Path(args.config)
+    if not config_path.exists():
+        print(f"❌ Configuration file not found: {config_path}")
+        sys.exit(1)
+
+    # Create output directory
+    output_dir = project_root / "output" / args.model.upper() / "OAI"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Test selected model
+    if args.model == "aot-gan":
+        test_aot_gan(config_path)
+    elif args.model == "ict":
+        test_ict(config_path)
+    elif args.model == "repaint":
+        test_repaint(config_path)
+
+    print(f"✅ Testing completed for {args.model}")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,53 @@
+# ICT Configuration for OAI Dataset
+# Platform-agnostic configuration file
+
+# Mode: 1=train, 2=test, 3=eval
+MODE: 2
+MODEL: 2
+MASK: 3
+EDGE: 1
+NMS: 1
+SEED: 10
+GPU: [0]
+DEBUG: 0
+VERBOSE: 0
+
+# Generator configuration
+Generator: 0
+No_Bar: True
+
+# Dataset paths (relative to project root)
+TRAIN_FLIST: "./data/oai/train/img"
+VAL_FLIST: "./data/oai/valid/img"
+TEST_FLIST: "./data/oai/test/img"
+
+# Edge detection paths
+TRAIN_EDGE_FLIST: "./data/oai/train/edge"
+VAL_EDGE_FLIST: "./data/oai/valid/edge"
+TEST_EDGE_FLIST: "./data/oai/test/edge"
+
+# Mask paths
+TRAIN_MASK_FLIST: "./data/oai/train/mask"
+VAL_MASK_FLIST: "./data/oai/valid/mask"
+TEST_MASK_FLIST: "./data/oai/test/mask"
+
+# Training parameters
+LR: 0.0001
+D2G_LR: 0.1
+BETA1: 0.0
+BETA2: 0.9
+BATCH_SIZE: 32
+INPUT_SIZE: 256
+SIGMA: 2
+MAX_ITERS: 5e6
+
+# Loss weights
+EDGE_THRESHOLD: 0.5
+L1_LOSS_WEIGHT: 1
+FM_LOSS_WEIGHT: 10
+STYLE_LOSS_WEIGHT: 250
+CONTENT_LOSS_WEIGHT: 0.1
+
+# Paths
+PATH: "./results/logs/ict"
+RESULTS: "./output/ICT/OAI"
