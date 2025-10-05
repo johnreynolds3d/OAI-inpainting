@@ -6,7 +6,7 @@ class Config(dict):
     def __init__(self, config_path):
         with open(config_path, "r") as f:
             self._yaml = f.read()
-            self._dict = yaml.load(self._yaml)
+            self._dict = yaml.load(self._yaml, Loader=yaml.FullLoader)
             self._dict["PATH"] = os.path.dirname(config_path)
 
     def __getattr__(self, name):
@@ -58,4 +58,6 @@ DEFAULT_CONFIG = {
     "SAMPLE_SIZE": 12,  # number of images to sample
     "EVAL_INTERVAL": 0,  # how many iterations to wait before model evaluation (0: never)
     "LOG_INTERVAL": 10,  # how many iterations to wait before logging training status (0: never)
+    "condition_num": 8,  # number of conditions for transformer prior
+    "prior_size": 32,  # prior size for transformer
 }

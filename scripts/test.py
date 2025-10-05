@@ -21,29 +21,41 @@ def test_aot_gan(config_path):
 
     # Change to AOT-GAN directory
     aot_gan_dir = project_root / "AOT-GAN-for-Inpainting" / "src"
+    original_dir = os.getcwd()
     os.chdir(aot_gan_dir)
 
-    # Import and run testing
-    from test import main_worker
+    try:
+        # Import and run testing
+        from test import main_worker
 
-    # Parse config
-    with open(config_path, "r") as f:
-        config = yaml.safe_load(f)
+        # Parse config
+        with open(config_path, "r") as f:
+            config = yaml.safe_load(f)
 
-    # Create args object
-    class Args:
-        def __init__(self, config):
-            for key, value in config.items():
-                if isinstance(value, dict):
-                    for subkey, subvalue in value.items():
-                        setattr(self, subkey, subvalue)
-                else:
-                    setattr(self, key, value)
+        # Create args object
+        class Args:
+            def __init__(self, config):
+                # Set default values
+                self.model = "aotgan"
+                self.pre_train = None
+                self.dir_image = None
+                self.dir_mask = None
+                self.outputs = None
 
-    args = Args(config)
+                # Override with config values
+                for key, value in config.items():
+                    if isinstance(value, dict):
+                        for subkey, subvalue in value.items():
+                            setattr(self, subkey, subvalue)
+                    else:
+                        setattr(self, key, value)
 
-    # Run testing
-    main_worker(args, use_gpu=True)
+        args = Args(config)
+
+        # Run testing
+        main_worker(args, use_gpu=True)
+    finally:
+        os.chdir(original_dir)
 
 
 def test_ict(config_path):
@@ -52,12 +64,16 @@ def test_ict(config_path):
 
     # Change to ICT directory
     ict_dir = project_root / "ICT" / "Guided_Upsample"
+    original_dir = os.getcwd()
     os.chdir(ict_dir)
 
-    # Import and run testing
-    from main import main
+    try:
+        # Import and run testing
+        from main import main
 
-    main(mode=2)  # Testing mode
+        main(mode=2)  # Testing mode
+    finally:
+        os.chdir(original_dir)
 
 
 def test_repaint(config_path):
@@ -66,27 +82,31 @@ def test_repaint(config_path):
 
     # Change to RePaint directory
     repaint_dir = project_root / "RePaint"
+    original_dir = os.getcwd()
     os.chdir(repaint_dir)
 
-    # Import and run testing
-    from test import main
-    from conf_mgt.conf_base import Default_Conf
+    try:
+        # Import and run testing
+        from test import main
+        from conf_mgt.conf_base import Default_Conf
 
-    # Parse config
-    with open(config_path, "r") as f:
-        config = yaml.safe_load(f)
+        # Parse config
+        with open(config_path, "r") as f:
+            config = yaml.safe_load(f)
 
-    # Create config object
-    conf = Default_Conf()
-    for key, value in config.items():
-        if isinstance(value, dict):
-            for subkey, subvalue in value.items():
-                setattr(conf, subkey, subvalue)
-        else:
-            setattr(conf, key, value)
+        # Create config object
+        conf = Default_Conf()
+        for key, value in config.items():
+            if isinstance(value, dict):
+                for subkey, subvalue in value.items():
+                    setattr(conf, subkey, subvalue)
+            else:
+                setattr(conf, key, value)
 
-    # Run testing
-    main(conf)
+        # Run testing
+        main(conf)
+    finally:
+        os.chdir(original_dir)
 
 
 def main():

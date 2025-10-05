@@ -26,10 +26,14 @@ from os.path import isfile, expanduser
 def to_file_ext(img_names, ext):
     img_names_out = []
     for img_name in img_names:
-        splits = img_name.split(".")
-        if not len(splits) == 2:
-            raise RuntimeError("File name needs exactly one '.':", img_name)
-        img_names_out.append(splits[0] + "." + ext)
+        # Handle filenames with multiple dots (like OAI dataset: 6.C.1_9103449_20090217_001.png)
+        if "." in img_name:
+            # Split only on the last dot to preserve the base filename
+            base_name = img_name.rsplit(".", 1)[0]
+            img_names_out.append(base_name + "." + ext)
+        else:
+            # No extension, just add the new extension
+            img_names_out.append(img_name + "." + ext)
 
     return img_names_out
 

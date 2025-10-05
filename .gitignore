@@ -1,5 +1,43 @@
 # Model checkpoints and experiments
 data/pretrained/
+ICT/ckpts_ICT/
+output/
 
 # OAI images
 data/oai/img/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Environment and IDE files
+.env
+.venv
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Model-specific temporary files
+checkpoints/
+results/
+logs/

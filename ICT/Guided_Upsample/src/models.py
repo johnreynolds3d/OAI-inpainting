@@ -68,6 +68,9 @@ class InpaintingModel(BaseModel):
         if config.Generator == 4:
             print("*******remove IN*******")
             generator = InpaintGenerator_5()
+        else:
+            # Default generator for other configurations
+            generator = InpaintGenerator_5()
 
         if config.Discriminator == 0:
             discriminator = Discriminator(
