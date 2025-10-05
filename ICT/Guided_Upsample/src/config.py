@@ -60,4 +60,5 @@ DEFAULT_CONFIG = {
     "LOG_INTERVAL": 10,  # how many iterations to wait before logging training status (0: never)
     "condition_num": 8,  # number of conditions for transformer prior
     "prior_size": 32,  # prior size for transformer
+    "test_batch_size": 1,  # batch size for testing
 }

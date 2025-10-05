@@ -47,7 +47,7 @@ def main_worker(args, use_gpu=True):
             pred_img = model(image_masked, mask)
 
         comp_imgs = (1 - mask) * image + mask * pred_img
-        image_name = os.path.basename(ipath).split(".")[0]
+        image_name = os.path.splitext(os.path.basename(ipath))[0]
         postprocess(image_masked[0]).save(
             os.path.join(args.outputs, f"{image_name}_masked.png")
         )

@@ -55,22 +55,10 @@ def run_command(cmd, description, cwd=None, timeout=300):
     return True
 
 
-def test_aot_gan():
-    """Test AOT-GAN on subset_4."""
-    print("\n" + "=" * 60)
-    print("🧪 TESTING AOT-GAN ON SUBSET_4")
-    print("=" * 60)
+def test_aot_gan_variant(model_name, model_path, output_dir, timeout=600):
+    """Test a specific AOT-GAN variant on subset_4."""
+    print(f"\n🧪 Testing AOT-GAN {model_name}...")
 
-    # Check if AOT-GAN pretrained models exist
-    aot_gan_models = project_root / "data" / "pretrained" / "aot-gan" / "OAI"
-    if not aot_gan_models.exists() or not any(aot_gan_models.iterdir()):
-        print("⚠️  AOT-GAN OAI pretrained models not found, using Places2 models")
-        model_path = project_root / "data" / "pretrained" / "aot-gan" / "places2"
-    else:
-        model_path = aot_gan_models
-
-    # Create output directory
-    output_dir = project_root / "output" / "AOT-GAN" / "OAI" / "subset_4"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Run AOT-GAN test directly
@@ -91,27 +79,57 @@ def test_aot_gan():
 
     return run_command(
         cmd,
-        "AOT-GAN testing on subset_4",
+        f"AOT-GAN {model_name} testing on subset_4",
         cwd=project_root / "AOT-GAN-for-Inpainting" / "src",
+        timeout=timeout,
     )
 
 
-def test_ict():
-    """Test ICT on subset_4."""
+def test_aot_gan(timeout=600):
+    """Test all AOT-GAN variants on subset_4."""
     print("\n" + "=" * 60)
-    print("🧪 TESTING ICT ON SUBSET_4")
+    print("🧪 TESTING AOT-GAN VARIANTS ON SUBSET_4")
     print("=" * 60)
 
-    # Check if ICT pretrained models exist (using backup structure)
-    ict_models = project_root / "ICT" / "ckpts_ICT" / "Upsample" / "OAI"
-    if not ict_models.exists() or not any(ict_models.iterdir()):
-        print("⚠️  ICT OAI pretrained models not found, using Places2_Nature models")
-        model_path = project_root / "ICT" / "ckpts_ICT" / "Upsample" / "Places2_Nature"
-    else:
-        model_path = ict_models
+    results = []
 
-    # Create output directory
-    output_dir = project_root / "output" / "ICT" / "OAI" / "subset_4"
+    # Test CelebA-HQ variant
+    celebahq_path = project_root / "data" / "pretrained" / "aot-gan" / "celebahq"
+    if celebahq_path.exists() and any(celebahq_path.iterdir()):
+        output_dir = project_root / "output" / "AOT-GAN" / "CelebA-HQ" / "subset_4"
+        result = test_aot_gan_variant("CelebA-HQ", celebahq_path, output_dir, timeout)
+        results.append(("AOT-GAN CelebA-HQ", result))
+    else:
+        print("⚠️  AOT-GAN CelebA-HQ models not found, skipping")
+        results.append(("AOT-GAN CelebA-HQ", False))
+
+    # Test Places2 variant
+    places2_path = project_root / "data" / "pretrained" / "aot-gan" / "places2"
+    if places2_path.exists() and any(places2_path.iterdir()):
+        output_dir = project_root / "output" / "AOT-GAN" / "Places2" / "subset_4"
+        result = test_aot_gan_variant("Places2", places2_path, output_dir, timeout)
+        results.append(("AOT-GAN Places2", result))
+    else:
+        print("⚠️  AOT-GAN Places2 models not found, skipping")
+        results.append(("AOT-GAN Places2", False))
+
+    # Test OAI variant (if available)
+    oai_path = project_root / "data" / "pretrained" / "aot-gan" / "OAI"
+    if oai_path.exists() and any(oai_path.iterdir()):
+        output_dir = project_root / "output" / "AOT-GAN" / "OAI" / "subset_4"
+        result = test_aot_gan_variant("OAI", oai_path, output_dir, timeout)
+        results.append(("AOT-GAN OAI", result))
+    else:
+        print("⚠️  AOT-GAN OAI models not found, skipping")
+        results.append(("AOT-GAN OAI", False))
+
+    return results
+
+
+def test_ict_variant(model_name, model_path, output_dir, timeout=600):
+    """Test a specific ICT variant on subset_4."""
+    print(f"\n🧪 Testing ICT {model_name}...")
+
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Create config file for ICT
@@ -137,6 +155,9 @@ RESULTS: {output_dir}
 
 BATCH_SIZE: 1
 INPUT_SIZE: 256
+condition_num: 1
+prior_size: 32
+test_batch_size: 1
 """
 
     # Create checkpoint directory and config file
@@ -151,18 +172,74 @@ INPUT_SIZE: 256
     cmd = ["python", "main.py", "--path", "checkpoints"]
 
     return run_command(
-        cmd, "ICT testing on subset_4", cwd=project_root / "ICT" / "Guided_Upsample"
+        cmd,
+        f"ICT {model_name} testing on subset_4",
+        cwd=project_root / "ICT" / "Guided_Upsample",
+        timeout=timeout,
     )
 
 
-def test_repaint():
-    """Test RePaint on subset_4."""
+def test_ict(timeout=600):
+    """Test all ICT variants on subset_4."""
     print("\n" + "=" * 60)
-    print("🧪 TESTING REPAINT ON SUBSET_4")
+    print("🧪 TESTING ICT VARIANTS ON SUBSET_4")
     print("=" * 60)
 
-    # Create output directory
-    output_dir = project_root / "output" / "RePaint" / "OAI" / "subset_4"
+    results = []
+
+    # Test FFHQ variant
+    ffhq_path = project_root / "data" / "pretrained" / "ict" / "Upsample" / "FFHQ"
+    if ffhq_path.exists() and any(ffhq_path.iterdir()):
+        output_dir = project_root / "output" / "ICT" / "FFHQ" / "subset_4"
+        result = test_ict_variant("FFHQ", ffhq_path, output_dir, timeout)
+        results.append(("ICT FFHQ", result))
+    else:
+        print("⚠️  ICT FFHQ models not found, skipping")
+        results.append(("ICT FFHQ", False))
+
+    # Test ImageNet variant
+    imagenet_path = (
+        project_root / "data" / "pretrained" / "ict" / "Upsample" / "ImageNet"
+    )
+    if imagenet_path.exists() and any(imagenet_path.iterdir()):
+        output_dir = project_root / "output" / "ICT" / "ImageNet" / "subset_4"
+        result = test_ict_variant("ImageNet", imagenet_path, output_dir, timeout)
+        results.append(("ICT ImageNet", result))
+    else:
+        print("⚠️  ICT ImageNet models not found, skipping")
+        results.append(("ICT ImageNet", False))
+
+    # Test Places2_Nature variant
+    places2_nature_path = (
+        project_root / "data" / "pretrained" / "ict" / "Upsample" / "Places2_Nature"
+    )
+    if places2_nature_path.exists() and any(places2_nature_path.iterdir()):
+        output_dir = project_root / "output" / "ICT" / "Places2_Nature" / "subset_4"
+        result = test_ict_variant(
+            "Places2_Nature", places2_nature_path, output_dir, timeout
+        )
+        results.append(("ICT Places2_Nature", result))
+    else:
+        print("⚠️  ICT Places2_Nature models not found, skipping")
+        results.append(("ICT Places2_Nature", False))
+
+    # Test OAI variant (if available)
+    oai_path = project_root / "ICT" / "ckpts_ICT" / "Upsample" / "OAI"
+    if oai_path.exists() and any(oai_path.iterdir()):
+        output_dir = project_root / "output" / "ICT" / "OAI" / "subset_4"
+        result = test_ict_variant("OAI", oai_path, output_dir, timeout)
+        results.append(("ICT OAI", result))
+    else:
+        print("⚠️  ICT OAI models not found, skipping")
+        results.append(("ICT OAI", False))
+
+    return results
+
+
+def test_repaint_variant(model_name, model_path, output_dir, timeout=600):
+    """Test a specific RePaint variant on subset_4."""
+    print(f"\n🧪 Testing RePaint {model_name}...")
+
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Create config file for RePaint (using working parameters from backup)
@@ -204,7 +281,7 @@ use_ddim: false
 latex_name: RePaint
 method_name: Repaint
 image_size: 256
-model_path: {project_root}/data/pretrained/repaint/places256_300000.pt
+model_path: {model_path}
 name: test_subset_4
 inpa_inj_sched_prev: true
 n_jobs: 1
@@ -239,14 +316,70 @@ data:
         gt_keep_masks: {output_dir}/gt_keep_mask
 """
 
-    config_path = project_root / "RePaint" / "subset_4_config.yml"
+    config_path = (
+        project_root
+        / "RePaint"
+        / f"subset_4_{model_name.lower().replace('-', '_')}_config.yml"
+    )
     with open(config_path, "w") as f:
         f.write(config_content)
 
     # Run RePaint test
-    cmd = ["python", "test.py", "--conf_path", "subset_4_config.yml"]
+    cmd = ["python", "test.py", "--conf_path", config_path.name]
 
-    return run_command(cmd, "RePaint testing on subset_4", cwd=project_root / "RePaint")
+    return run_command(
+        cmd,
+        f"RePaint {model_name} testing on subset_4",
+        cwd=project_root / "RePaint",
+        timeout=timeout,
+    )
+
+
+def test_repaint(timeout=600):
+    """Test all RePaint variants on subset_4."""
+    print("\n" + "=" * 60)
+    print("🧪 TESTING REPAINT VARIANTS ON SUBSET_4")
+    print("=" * 60)
+
+    results = []
+
+    # Test CelebA-HQ variant
+    celebahq_model = (
+        project_root / "data" / "pretrained" / "repaint" / "celeba256_250000.pt"
+    )
+    if celebahq_model.exists():
+        output_dir = project_root / "output" / "RePaint" / "CelebA-HQ" / "subset_4"
+        result = test_repaint_variant("CelebA-HQ", celebahq_model, output_dir, timeout)
+        results.append(("RePaint CelebA-HQ", result))
+    else:
+        print("⚠️  RePaint CelebA-HQ model not found, skipping")
+        results.append(("RePaint CelebA-HQ", False))
+
+    # Test ImageNet variant
+    imagenet_model = (
+        project_root / "data" / "pretrained" / "repaint" / "256x256_diffusion.pt"
+    )
+    if imagenet_model.exists():
+        output_dir = project_root / "output" / "RePaint" / "ImageNet" / "subset_4"
+        result = test_repaint_variant("ImageNet", imagenet_model, output_dir, timeout)
+        results.append(("RePaint ImageNet", result))
+    else:
+        print("⚠️  RePaint ImageNet model not found, skipping")
+        results.append(("RePaint ImageNet", False))
+
+    # Test Places2 variant
+    places2_model = (
+        project_root / "data" / "pretrained" / "repaint" / "places256_300000.pt"
+    )
+    if places2_model.exists():
+        output_dir = project_root / "output" / "RePaint" / "Places2" / "subset_4"
+        result = test_repaint_variant("Places2", places2_model, output_dir, timeout)
+        results.append(("RePaint Places2", result))
+    else:
+        print("⚠️  RePaint Places2 model not found, skipping")
+        results.append(("RePaint Places2", False))
+
+    return results
 
 
 def check_subset_4():
@@ -324,35 +457,56 @@ def main():
         sys.exit(1)
 
     # Test each model
-    results = {}
+    all_results = []
     for model in models_to_test:
         if model == "aot-gan":
-            results["aot-gan"] = test_aot_gan()
+            model_results = test_aot_gan(timeout=args.timeout)
+            all_results.extend(model_results)
         elif model == "ict":
-            results["ict"] = test_ict()
+            model_results = test_ict(timeout=args.timeout)
+            all_results.extend(model_results)
         elif model == "repaint":
-            results["repaint"] = test_repaint()
+            model_results = test_repaint(timeout=args.timeout)
+            all_results.extend(model_results)
 
     # Print summary
     print("\n" + "=" * 60)
     print("📋 TESTING SUMMARY")
     print("=" * 60)
 
-    for model, success in results.items():
-        status = "✅ PASSED" if success else "❌ FAILED"
-        print(f"{model.upper():<10}: {status}")
+    all_passed = True
+    for model_name, result in all_results:
+        status = "✅ PASSED" if result else "❌ FAILED"
+        print(f"{model_name:<20}: {status}")
+        if not result:
+            all_passed = False
 
     # Print output directories
     print(f"\n📁 Output directories:")
-    for model in models_to_test:
-        output_dir = project_root / "output" / model.upper() / "OAI" / "subset_4"
-        print(f"   {model}: {output_dir}")
+    for model_name, result in all_results:
+        if result:  # Only show directories for successful tests
+            if "AOT-GAN" in model_name:
+                variant = model_name.split()[-1]
+                print(
+                    f"   {model_name}: /var/home/john/Documents/Code/OAI-inpainting/output/AOT-GAN/{variant}/subset_4"
+                )
+            elif "ICT" in model_name:
+                variant = model_name.split()[-1]
+                print(
+                    f"   {model_name}: /var/home/john/Documents/Code/OAI-inpainting/output/ICT/{variant}/subset_4"
+                )
+            elif "RePaint" in model_name:
+                variant = model_name.split()[-1]
+                print(
+                    f"   {model_name}: /var/home/john/Documents/Code/OAI-inpainting/output/RePaint/{variant}/subset_4"
+                )
 
-    if all(results.values()):
+    if all_passed:
         print("\n🎉 All tests completed successfully!")
         print("Check the output directories for results.")
     else:
-        print("\n⚠️  Some tests failed. Check the output above for details.")
+        print("\n❌ Some tests failed. Check the logs above for details.")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
