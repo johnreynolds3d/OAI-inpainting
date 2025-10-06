@@ -2,48 +2,39 @@
 
 This directory contains comprehensive documentation for the OAI inpainting project.
 
-## Structure
+## 📚 Available Documentation
 
 ```
 docs/
 ├── installation.md       # Installation and setup guide
-├── usage.md             # Usage instructions
-├── api.md               # API documentation
-├── experiments.md       # Experimental procedures
-├── results.md           # Results and analysis
-├── troubleshooting.md   # Common issues and solutions
-└── contributing.md      # Contribution guidelines
+├── usage.md             # Usage instructions and examples
+├── contributing.md      # Contribution guidelines
+└── README.md            # This file (documentation overview)
 ```
 
-## Quick Start
+## 🚀 Quick Navigation
 
-1. **Installation**: See [installation.md](installation.md)
-2. **Usage**: See [usage.md](usage.md)
-3. **Experiments**: See [experiments.md](experiments.md)
-4. **Results**: See [results.md](results.md)
+- **[Installation Guide](installation.md)** - Get started with setup and configuration
+- **[Usage Guide](usage.md)** - Learn how to train, test, and evaluate models
+- **[Contributing Guide](contributing.md)** - Guidelines for contributing to the project
 
-## Project Overview
+## 📖 Documentation Structure
 
-This project implements and compares three state-of-the-art inpainting methods on X-ray images from the Osteoarthritis Initiative (OAI) dataset:
+### Getting Started
+- **Installation**: Complete setup instructions for all platforms
+- **Usage**: Step-by-step guides for training and evaluation
 
-- **AOT-GAN**: Attention-based Outpainting Transformer for Generative Adversarial Networks
-- **ICT**: Image Completion Transformer
-- **RePaint**: Repaint-based diffusion model for inpainting
+### Development
+- **Contributing**: Guidelines for code contributions and development workflow
 
-## Key Features
+## 🔗 Related Resources
 
-- Platform-agnostic design for reproducibility
-- Unified training and testing scripts
-- Comprehensive evaluation framework
-- Automated comparison and analysis tools
-- Extensive documentation and tutorials
+- **Main Project README**: See the root [README.md](../README.md) for project overview
+- **Code Quality**: The project uses Ruff for linting/formatting and MyPy for type checking
+- **Issues**: Report bugs or request features on the [GitHub Issues](https://github.com/your-org/oai-inpainting/issues) page
 
-## Getting Help
+## 📞 Getting Help
 
-- Check [troubleshooting.md](troubleshooting.md) for common issues
-- Review [experiments.md](experiments.md) for experimental procedures
-- See [api.md](api.md) for detailed API documentation
-
-## Contributing
-
-Please read [contributing.md](contributing.md) for guidelines on contributing to this project.
+- Check the [troubleshooting section](installation.md#troubleshooting) for common issues
+- Review the [usage examples](usage.md#examples) for detailed workflows
+- Create an issue on GitHub for specific problems or questions
