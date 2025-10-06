@@ -315,7 +315,18 @@ See [CONTRIBUTING.md](docs/contributing.md) for detailed guidelines.
 
 ## 📄 License
 
-[Add your license information here]
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+**Important**: This project includes third-party models and code with their own licenses:
+- **AOT-GAN**: Apache 2.0 License
+- **RePaint**: MIT License + CC BY-NC-SA 4.0 (Huawei)
+- **ICT**: Research use only
+
+Please review the individual license files in the `models/` directory for specific terms.
+
+## 🔬 Research Use
+
+This project is intended for academic research and educational purposes. The OAI dataset is used under appropriate research agreements. Commercial use may require additional permissions from third-party licensors.
 
 ## 🙏 Acknowledgments
 
