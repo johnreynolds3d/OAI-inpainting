@@ -292,8 +292,8 @@ ls results/evaluation/comprehensive/
 ### Custom Training
 
 ```python
-from utils.data import create_data_loaders
-from utils.config import load_config
+from src.data import create_data_loaders
+from src.config import load_config
 
 # Load configuration
 config = load_config("configs/aot-gan/oai_config.yml")

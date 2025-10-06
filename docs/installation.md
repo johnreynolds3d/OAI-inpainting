@@ -103,7 +103,7 @@ pre-commit install
 python -c "import torch; print(f'PyTorch version: {torch.__version__}'); print(f'CUDA available: {torch.cuda.is_available()}')"
 
 # Test project imports
-python -c "from utils.paths import get_project_root; print(f'Project root: {get_project_root()}')"
+python -c "from src.paths import get_project_root; print(f'Project root: {get_project_root()}')"
 ```
 
 ## Data Setup

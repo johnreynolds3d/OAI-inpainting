@@ -23,10 +23,12 @@ OAI-inpainting/
 │   ├── test.py
 │   ├── evaluate.py
 │   └── setup_data.py           # Data setup script
-├── utils/                       # Shared utilities
+├── src/                         # Core source code
 │   ├── paths.py
 │   ├── config.py
-│   └── data.py
+│   ├── data.py
+│   ├── experiment_tracking.py
+│   └── data_versioning.py
 ├── data/                        # Data management
 │   ├── oai/                     # OAI dataset
 │   └── pretrained/              # Pretrained models
@@ -35,11 +37,12 @@ OAI-inpainting/
 │   ├── plots/
 │   └── logs/
 ├── docs/                        # Documentation
-├── AOT-GAN-for-Inpainting/      # AOT-GAN implementation
-├── ICT/                         # ICT implementation
-├── RePaint/                     # RePaint implementation
-├── classifier/                  # Classification utilities
-└── output/                      # Generated results
+├── models/                      # Model implementations
+│   ├── aot-gan/                # AOT-GAN implementation
+│   ├── ict/                    # ICT implementation
+│   ├── repaint/                # RePaint implementation
+│   └── classifier/             # Classification utilities
+└── results/                     # Generated results
 ```
 
 ## 🚀 Quick Start
@@ -202,7 +205,7 @@ training:
 Generated results are organized by model and dataset:
 
 ```
-output/
+results/
 ├── AOT-GAN/OAI/
 ├── ICT/OAI/
 └── RePaint/OAI/
@@ -220,7 +223,7 @@ output/
 
 - **Platform-agnostic**: Works on Linux, macOS, Windows
 - **Version control**: All configurations tracked in git
-- **Pre-commit hooks**: Automatic code formatting with Black
+- **Pre-commit hooks**: Automatic code formatting and linting with Ruff
 - **Documentation**: Comprehensive guides and tutorials
 
 ### Comparison Studies
@@ -246,6 +249,48 @@ This project enables research in:
 - **Osteoporosis Detection**: Classification of bone density from X-ray images
 - **Inpainting Quality Assessment**: Comparison of different inpainting approaches
 - **Transfer Learning**: Adapting pretrained models to medical imaging
+
+## 🛠️ Development
+
+### Code Quality
+
+This project uses modern Python development tools:
+
+- **Ruff**: Fast Python linter and formatter (replaces Black + flake8)
+- **MyPy**: Static type checking
+- **Pre-commit**: Automated code quality checks
+- **Pytest**: Testing framework with coverage reporting
+
+### Development Commands
+
+```bash
+# Format code
+ruff format .
+
+# Lint code
+ruff check .
+
+# Fix linting issues automatically
+ruff check . --fix
+
+# Run type checking
+mypy src/ scripts/
+
+# Run tests
+pytest tests/
+
+# Run tests with coverage
+pytest tests/ --cov=src --cov-report=html
+```
+
+### Pre-commit Hooks
+
+The project includes pre-commit hooks that automatically:
+- Format code with Ruff
+- Check for linting issues
+- Validate YAML/JSON files
+- Check for large files
+- Ensure proper line endings
 
 ## 🤝 Contributing
 
