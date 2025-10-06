@@ -47,11 +47,22 @@ OAI-inpainting/
 
 ## 🚀 Quick Start
 
-### Installation
+### Option 1: Google Colab (Recommended for GPU access)
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/johnreynolds3d/OAI-inpainting/blob/master/notebooks/OAI_Inpainting_Colab.ipynb)
+
+**Direct Colab Link**: https://colab.research.google.com/github/johnreynolds3d/OAI-inpainting/blob/master/notebooks/OAI_Inpainting_Colab.ipynb
+
+1. Click the "Open in Colab" button above
+2. Upload your OAI data to Google Drive
+3. Run the notebook cells in order
+4. Start training and testing immediately!
+
+### Option 2: Local Installation
 
 ```bash
 # Clone repository
-git clone <repository-url>
+git clone https://github.com/johnreynolds3d/OAI-inpainting.git
 cd OAI-inpainting
 
 # Create virtual environment
@@ -60,7 +71,7 @@ source venv/bin/activate  # Linux/macOS
 # venv\Scripts\activate   # Windows
 
 # Install dependencies
-pip install -r requirements-dev.txt
+pip install -e ".[dev,ml]"
 
 # Install pre-commit hooks
 pre-commit install

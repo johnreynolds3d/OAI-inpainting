@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Open OAI Inpainting in Colab</title>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .colab-button {
+            display: inline-block;
+            background: #4285f4;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 18px;
+            margin: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .colab-button:hover {
+            background: #3367d6;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .instructions {
+            text-align: left;
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .step {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-left: 4px solid #4285f4;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 OAI X-ray Inpainting - Google Colab</h1>
+
+    <p>Click the button below to open the notebook in Google Colab:</p>
+
+    <a href="https://colab.research.google.com/github/johnreynolds3d/OAI-inpainting/blob/master/notebooks/OAI_Inpainting_Colab.ipynb"
+       class="colab-button" target="_blank">
+        📓 Open in Google Colab
+    </a>
+
+    <div class="instructions">
+        <h2>📋 Quick Setup Instructions:</h2>
+
+        <div class="step">
+            <strong>Step 1:</strong> Click the "Open in Google Colab" button above
+        </div>
+
+        <div class="step">
+            <strong>Step 2:</strong> Upload your OAI data to Google Drive at:<br>
+            <code>/content/drive/MyDrive/Colab Notebooks/OAI_untracked/</code>
+        </div>
+
+        <div class="step">
+            <strong>Step 3:</strong> Run the notebook cells in order (Shift+Enter)
+        </div>
+
+        <div class="step">
+            <strong>Step 4:</strong> Start training and testing your models!
+        </div>
+    </div>
+
+    <div class="instructions">
+        <h2>📁 Required Data Structure:</h2>
+        <pre>
+OAI_untracked/
+├── data/
+│   ├── oai/
+│   │   └── img/          # 539 PNG files
+│   └── pretrained/       # 19 model files
+│       ├── aot-gan/
+│       ├── ict/
+│       └── repaint/
+        </pre>
+    </div>
+
+    <div class="instructions">
+        <h2>🔗 Alternative Access Methods:</h2>
+        <ul>
+            <li><strong>Direct URL:</strong> <a href="https://colab.research.google.com/github/johnreynolds3d/OAI-inpainting/blob/master/notebooks/OAI_Inpainting_Colab.ipynb">https://colab.research.google.com/github/johnreynolds3d/OAI-inpainting/blob/master/notebooks/OAI_Inpainting_Colab.ipynb</a></li>
+            <li><strong>GitHub:</strong> <a href="https://github.com/johnreynolds3d/OAI-inpainting/blob/master/notebooks/OAI_Inpainting_Colab.ipynb">View on GitHub</a></li>
+            <li><strong>Download:</strong> Right-click the notebook file and "Save as" to download locally</li>
+        </ul>
+    </div>
+
+    <p><em>Note: You'll need a Google account to use Google Colab. The notebook will automatically handle all setup and installation.</em></p>
+</body>
+</html>
