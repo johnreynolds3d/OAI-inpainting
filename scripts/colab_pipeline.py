@@ -14,7 +14,8 @@ import ipywidgets as widgets
 from IPython.display import display
 
 # Add project root to path
-project_root = Path.cwd() / "OAI-inpainting"
+# In Colab, we're already in the OAI-inpainting directory
+project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 
 
