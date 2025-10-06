@@ -53,10 +53,54 @@ OAI-inpainting/
 
 **Direct Colab Link**: https://colab.research.google.com/github/johnreynolds3d/OAI-inpainting/blob/master/notebooks/OAI_Inpainting_Colab.ipynb
 
-1. Click the "Open in Colab" button above
-2. Upload your OAI data to Google Drive
-3. Run the notebook cells in order
-4. Start training and testing immediately!
+#### Google Colab Setup Steps:
+
+1. **Upload Data to Google Drive**:
+   - Upload the entire `OAI_untracked/` directory to:
+     ```
+     /content/drive/MyDrive/Colab Notebooks/OAI_untracked/
+     ```
+   - This includes all 539 OAI images and pretrained models (~16GB total)
+
+2. **Run the Colab Notebook**:
+   - Click the "Open in Colab" button above
+   - The notebook will automatically:
+     - Mount Google Drive
+     - Detect your data structure
+     - Copy data to local storage for performance
+     - Generate train/valid/test splits
+     - Create masks and edge maps
+
+3. **Verify Setup**:
+   ```bash
+   # Check image count (should show 540: 539 files + 1 for total line)
+   ls -la "/content/drive/MyDrive/Colab Notebooks/OAI_untracked/data/oai/img/" | wc -l
+   ```
+
+4. **Start Training**:
+   - Run the pipeline cells in order
+   - All models will be trained and evaluated automatically
+
+#### Colab Data Structure:
+```
+/content/drive/MyDrive/Colab Notebooks/OAI_untracked/
+├── data/
+│   ├── oai/
+│   │   └── img/                    # 539 OAI X-ray images
+│   │       ├── 6.C.1_*.png        # Osteoporotic cases
+│   │       └── 6.E.1_*.png        # Normal cases
+│   └── pretrained/                 # Pretrained models
+│       ├── aot-gan/               # AOT-GAN models
+│       ├── ict/                   # ICT models
+│       └── repaint/               # RePaint models
+└── README.md                      # Data documentation
+```
+
+#### Important Colab Notes:
+- **Upload time**: May take 30-60 minutes depending on connection
+- **Storage**: Ensure sufficient Google Drive space (16GB+)
+- **Permissions**: Make sure Colab can access the files
+- **Large files**: Some model files are >1GB
 
 ### Option 2: Local Installation
 
@@ -101,19 +145,30 @@ OAI_untracked/                    # Can be named differently
 ├── data/
 │   ├── oai/
 │   │   └── img/                  # OAI X-ray images (required)
-│   │       ├── 6.C.1_*.png
-│   │       └── 6.E.1_*.png
+│   │       ├── 6.C.1_*.png      # Osteoporotic cases
+│   │       └── 6.E.1_*.png      # Normal cases
 │   └── pretrained/               # Pretrained models (optional)
-│       ├── aot-gan/
-│       ├── ict/
-│       └── repaint/
+│       ├── aot-gan/             # AOT-GAN pretrained models
+│       │   ├── celebahq/        # CelebA-HQ models
+│       │   └── places2/         # Places2 models
+│       ├── ict/                 # ICT pretrained models
+│       │   ├── Transformer/     # Transformer models
+│       │   └── Upsample/        # Upsampler models
+│       └── repaint/             # RePaint pretrained models
+│           ├── 256x256_classifier.pt
+│           ├── 256x256_diffusion.pt
+│           ├── celeba256_250000.pt
+│           └── places256_300000.pt
+└── README.md                    # Data documentation
 ```
 
 **Data Requirements:**
+- **Total size**: ~16GB
+- **Total files**: 559
 - **OAI Images**: 539 PNG files (~11.6 MB) - Required
-- **AOT-GAN Models**: 8 files (~411 MB) - Optional
-- **ICT Models**: 15 files (~8.3 GB) - Optional
-- **RePaint Models**: 4 files (~6.4 GB) - Optional
+- **AOT-GAN Models**: 6 files (~2GB) - Optional
+- **ICT Models**: 9 files (~8.3GB) - Optional
+- **RePaint Models**: 4 files (~6.4GB) - Optional
 
 **Setup Script Features:**
 - Auto-detects untracked data directories in common locations
@@ -170,6 +225,8 @@ python split.py  # Generates balanced splits and masks
 
 ### Troubleshooting Data Setup
 
+#### Local Setup Issues
+
 **"Could not find untracked data directory"**
 - Use `--source-dir` to specify the exact path: `python scripts/setup_data.py --source-dir /path/to/OAI_untracked`
 
@@ -182,6 +239,41 @@ python split.py  # Generates balanced splits and masks
 
 **"Permission denied"**
 - Fix permissions: `chmod -R 755 .`
+
+#### Google Colab Issues
+
+**"OAI data not found in Google Drive"**
+- Verify data is uploaded to: `/content/drive/MyDrive/Colab Notebooks/OAI_untracked/`
+- Check file permissions in Google Drive
+- Ensure directory structure matches exactly
+
+**"Upload failed or incomplete"**
+- Large files (>1GB) may timeout - try uploading in smaller batches
+- Check Google Drive storage space (need 16GB+)
+- Verify internet connection stability
+
+**"Colab can't access files"**
+- Check Google Drive sharing permissions
+- Ensure files are not in "Shared with me" folder
+- Try moving files to "My Drive" root directory
+
+**"subset_4 data not found"**
+- Run the data splitting cell in the Colab notebook
+- This generates the test subset automatically
+- Check that `data/oai/split.py` runs successfully
+
+#### General Data Issues
+
+**"Image count mismatch"**
+- Expected: 539 PNG files in `data/oai/img/`
+- Check: `ls -la data/oai/img/ | wc -l` (should show 540: 539 files + 1 for total line)
+- Verify file naming: `6.C.1_*.png` (osteoporotic), `6.E.1_*.png` (normal)
+
+**"Model files missing"**
+- AOT-GAN: 6 files (~2GB) in `pretrained/aot-gan/`
+- ICT: 9 files (~8.3GB) in `pretrained/ict/`
+- RePaint: 4 files (~6.4GB) in `pretrained/repaint/`
+- Missing models will use random initialization (reduced performance)
 
 ## 🔧 Configuration
 
