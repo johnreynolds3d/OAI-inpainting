@@ -247,3 +247,7 @@ def validate_config(config: BaseConfig) -> bool:
     except Exception as e:
         print(f"❌ Configuration validation failed: {e}")
         return False
+
+
+# Alias for backward compatibility
+Config = BaseConfig
