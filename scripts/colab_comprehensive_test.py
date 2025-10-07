@@ -39,7 +39,7 @@ class ModelTester:
         """Log message with timestamp and level."""
         timestamp = datetime.now().strftime("%H:%M:%S")
         emoji_map = {
-            "INFO": "i",  # noqa: RUF001
+            "INFO": "i",
             "SUCCESS": "✅",
             "ERROR": "❌",
             "WARNING": "⚠️",
