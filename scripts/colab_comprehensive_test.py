@@ -205,58 +205,31 @@ class ModelTester:
 
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Create temporary config for Guided_Upsample testing
-        config_content = f"""MODE: 2
-MODEL: 2
-MASK: 3
-EDGE: 1
-NMS: 1
-SEED: 10
-GPU: [0]
-DEBUG: 0
-VERBOSE: 0
-
-Generator: 0
-No_Bar: True
-
-TEST_FLIST: {project_root}/data/oai/test/img/subset_4
-TEST_EDGE_FLIST: {project_root}/data/oai/test/edge/subset_4
-TEST_MASK_FLIST: {project_root}/data/oai/test/mask/subset_4
-
-PATH: {model_path}
-RESULTS: {output_dir}
-
-BATCH_SIZE: 1
-INPUT_SIZE: 256
-condition_num: 1
-prior_size: 32
-test_batch_size: 1
-"""
-
-        # Create config in Guided_Upsample directory (correct location for batch testing)
-        config_path = (
-            project_root
-            / "models"
-            / "ict"
-            / "Guided_Upsample"
-            / f"test_subset_4_{variant_name.lower()}.yml"
-        )
-        with config_path.open("w") as f:
-            f.write(config_content)
-
-        # Use main.py with mode 2 (testing mode) - this is for batch testing
-        # Run from Guided_Upsample directory which has the proper test infrastructure
-        cmd = ["python", "main.py", "--mode", "2", "--config", config_path.name]
+        # ICT uses command-line arguments and expects config.yml in the checkpoint directory
+        # Use --path to point to the model directory (which contains config.yml)
+        # Use --input, --mask, --output to specify test data paths
+        cmd = [
+            "python",
+            "main.py",
+            "--path",
+            str(model_path),
+            "--model",
+            "2",  # Inpaint model
+            "--input",
+            str(project_root / "data" / "oai" / "test" / "img" / "subset_4"),
+            "--mask",
+            str(project_root / "data" / "oai" / "test" / "mask" / "subset_4"),
+            "--edge",
+            str(project_root / "data" / "oai" / "test" / "edge" / "subset_4"),
+            "--output",
+            str(output_dir),
+        ]
 
         success, _output, elapsed = self.run_command(
             cmd,
             f"ICT {variant_name}",
             cwd=project_root / "models" / "ict" / "Guided_Upsample",
         )
-
-        # Clean up config
-        if config_path.exists():
-            config_path.unlink()
 
         return success, elapsed
 
