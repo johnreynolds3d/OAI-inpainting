@@ -18,6 +18,42 @@ class BaseModel(nn.Module):
         self.gen_weights_path = os.path.join(config.PATH, name + "_gen.pth")
         self.dis_weights_path = os.path.join(config.PATH, name + "_dis.pth")
 
+    def _strip_dataparallel_prefix(self, state_dict):
+        """
+        Remove 'module.' prefix from state dict keys.
+
+        When a model is saved with DataParallel (multi-GPU training), PyTorch adds
+        a 'module.' prefix to all parameter names. When loading on a single GPU,
+        these prefixes cause key mismatch errors.
+
+        This function detects if the state dict has DataParallel prefixes and
+        strips them if present, ensuring compatibility between single and multi-GPU
+        trained checkpoints.
+
+        Args:
+            state_dict: The loaded state dictionary from checkpoint
+
+        Returns:
+            state_dict: Fixed state dictionary with stripped prefixes if needed
+        """
+        # Check if any key has the 'module.' prefix
+        has_module_prefix = any(key.startswith("module.") for key in state_dict)
+
+        if has_module_prefix:
+            print(
+                "   ⚠️  Detected DataParallel checkpoint - stripping 'module.' prefixes..."
+            )
+            # Create new state dict with stripped keys
+            new_state_dict = {}
+            for key, value in state_dict.items():
+                # Remove 'module.' prefix if present
+                new_key = key[7:] if key.startswith("module.") else key
+                new_state_dict[new_key] = value
+            print(f"   ✅ Converted {len(state_dict)} keys for single-GPU loading")
+            return new_state_dict
+
+        return state_dict
+
     def load(self):
         if os.path.exists(self.gen_weights_path):
             print(f"Loading {self.name} generator...")
@@ -29,7 +65,9 @@ class BaseModel(nn.Module):
                     self.gen_weights_path, map_location=lambda storage, loc: storage
                 )
 
-            self.generator.load_state_dict(data["generator"])
+            # Strip DataParallel prefixes if present (for multi-GPU trained models)
+            generator_state = self._strip_dataparallel_prefix(data["generator"])
+            self.generator.load_state_dict(generator_state)
             self.iteration = data["iteration"]
 
         # load discriminator only when training
@@ -45,7 +83,9 @@ class BaseModel(nn.Module):
                     self.dis_weights_path, map_location=lambda storage, loc: storage
                 )
 
-            self.discriminator.load_state_dict(data["discriminator"])
+            # Strip DataParallel prefixes if present (for multi-GPU trained models)
+            discriminator_state = self._strip_dataparallel_prefix(data["discriminator"])
+            self.discriminator.load_state_dict(discriminator_state)
 
     def save(self):
         print(f"\nsaving {self.name}...\n")
