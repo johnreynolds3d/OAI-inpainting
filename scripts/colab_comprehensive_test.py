@@ -15,6 +15,7 @@ Total: 9 model variants tested on 4 OAI X-ray images
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -219,6 +220,32 @@ class ModelTester:
             if not symlink_path.exists():
                 symlink_path.symlink_to(edge_file)
 
+        # Fix GPU configuration for models that specify multiple GPUs
+        # Temporarily modify config.yml to use only GPU [0] for Colab
+        config_file = model_path / "config.yml"
+        config_backup = model_path / "config.yml.backup"
+        config_modified = False
+
+        if config_file.exists():
+            # Backup original config
+            shutil.copy(config_file, config_backup)
+
+            # Read and check if modification is needed
+            with config_file.open("r") as f:
+                config_content = f.read()
+
+            # Check if config has multiple GPUs
+            if "GPU: [0,1]" in config_content or "GPU: [0, 1]" in config_content:
+                self.log(f"Modifying {variant_name} config to use single GPU", "INFO")
+                # Replace multiple GPUs with single GPU
+                config_content = config_content.replace("GPU: [0,1]", "GPU: [0]")
+                config_content = config_content.replace("GPU: [0, 1]", "GPU: [0]")
+
+                with config_file.open("w") as f:
+                    f.write(config_content)
+
+                config_modified = True
+
         # ICT uses test.py which calls main(mode=2), enabling test-mode arguments
         # Use --path to point to the model directory (which contains config.yml)
         # Set condition_num=1 since we only have one edge map per image
@@ -252,6 +279,11 @@ class ModelTester:
             cwd=project_root / "models" / "ict" / "Guided_Upsample",
             env=env,
         )
+
+        # Restore original config if it was modified
+        if config_modified and config_backup.exists():
+            shutil.move(str(config_backup), str(config_file))
+            self.log(f"Restored original {variant_name} config", "INFO")
 
         return success, elapsed
 
