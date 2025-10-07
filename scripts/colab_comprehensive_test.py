@@ -406,7 +406,7 @@ data:
     subset_4_test:
       mask_loader: true
       gt_path: {project_root}/data/oai/test/img/subset_4
-      mask_path: {project_root}/data/oai/test/mask/subset_4
+      mask_path: {project_root}/data/oai/test/mask_inv/subset_4
       image_size: 256
       class_cond: false
       deterministic: true
