@@ -199,93 +199,166 @@ class ModelTester:
     def test_ict_variant(
         self, variant_name: str, model_path: Path, output_dir: Path
     ) -> Tuple[bool, float]:
-        """Test a specific ICT variant."""
+        """
+        Test a specific ICT variant using the TWO-STAGE process.
+
+        Stage 1 (Transformer): Generate low-resolution appearance priors
+        Stage 2 (Guided_Upsample): Upsample guided by transformer priors
+
+        This is CRITICAL - skipping Stage 1 produces distorted outputs!
+        """
         self.log(f"Testing ICT {variant_name}...", "PHASE")
 
+        # Find transformer model (Stage 1)
+        transformer_model = (
+            project_root
+            / "data"
+            / "pretrained"
+            / "ict"
+            / "Transformer"
+            / f"{variant_name}.pth"
+        )
+
+        if not transformer_model.exists():
+            self.log(f"Transformer model not found: {transformer_model}", "WARNING")
+            return False, 0.0
+
         if not model_path.exists():
-            self.log(f"Model path not found: {model_path}", "WARNING")
+            self.log(f"Upsample model not found: {model_path}", "WARNING")
             return False, 0.0
 
         output_dir.mkdir(parents=True, exist_ok=True)
+        stage1_output = output_dir / "stage1_transformer"
+        stage1_output.mkdir(parents=True, exist_ok=True)
 
-        # ICT expects edge files in condition_N subdirectories for testing
-        # Create condition_1 directory with symlinks to actual edge files
-        edge_base = project_root / "data" / "oai" / "test" / "edge" / "subset_4"
-        condition_1_dir = edge_base / "condition_1"
-        condition_1_dir.mkdir(parents=True, exist_ok=True)
+        # Set environment for single GPU
+        env = os.environ.copy()
+        env["CUDA_VISIBLE_DEVICES"] = "0"
+        total_start = time.time()
 
-        # Create symlinks for each edge file in condition_1/
-        for edge_file in edge_base.glob("*.png"):
-            symlink_path = condition_1_dir / edge_file.name
-            if not symlink_path.exists():
-                symlink_path.symlink_to(edge_file)
+        # ========== STAGE 1: Transformer - Generate appearance priors ==========
+        self.log("  Stage 1/2: Transformer", "INFO")
 
-        # Fix GPU configuration for models that specify multiple GPUs
-        # Temporarily modify config.yml to use only GPU [0] for Colab
+        # Model-specific transformer parameters
+        transformer_params = {
+            "ImageNet": {
+                "n_layer": "35",
+                "n_embd": "1024",
+                "n_head": "8",
+                "image_size": "32",
+            },
+            "FFHQ": {
+                "n_layer": "30",
+                "n_embd": "512",
+                "n_head": "8",
+                "image_size": "48",
+            },
+            "Places2_Nature": {
+                "n_layer": "35",
+                "n_embd": "512",
+                "n_head": "8",
+                "image_size": "32",
+            },
+        }
+
+        params = transformer_params.get(variant_name, transformer_params["ImageNet"])
+
+        stage1_cmd = [
+            "python",
+            "inference.py",
+            "--ckpt_path",
+            str(transformer_model),
+            "--BERT",
+            "--image_url",
+            str(project_root / "data" / "oai" / "test" / "img" / "subset_4"),
+            "--mask_url",
+            str(project_root / "data" / "oai" / "test" / "mask" / "subset_4"),
+            "--n_layer",
+            params["n_layer"],
+            "--n_embd",
+            params["n_embd"],
+            "--n_head",
+            params["n_head"],
+            "--top_k",
+            "40",
+            "--GELU_2",
+            "--save_url",
+            str(stage1_output),
+            "--image_size",
+            params["image_size"],
+            "--n_samples",
+            "1",
+        ]
+
+        stage1_success, _, stage1_time = self.run_command(
+            stage1_cmd,
+            "Transformer",
+            cwd=project_root / "models" / "ict" / "Transformer",
+            env=env,
+            timeout=300,
+        )
+
+        if not stage1_success:
+            self.log("Stage 1 failed", "ERROR")
+            return False, stage1_time
+
+        # ========== STAGE 2: Guided Upsample ==========
+        self.log("  Stage 2/2: Guided Upsample", "INFO")
+
+        # Fix GPU config
         config_file = model_path / "config.yml"
         config_backup = model_path / "config.yml.backup"
         config_modified = False
 
         if config_file.exists():
-            # Backup original config
             shutil.copy(config_file, config_backup)
-
-            # Read and check if modification is needed
             with config_file.open("r") as f:
                 config_content = f.read()
-
-            # Check if config has multiple GPUs
             if "GPU: [0,1]" in config_content or "GPU: [0, 1]" in config_content:
-                self.log(f"Modifying {variant_name} config to use single GPU", "INFO")
-                # Replace multiple GPUs with single GPU
                 config_content = config_content.replace("GPU: [0,1]", "GPU: [0]")
                 config_content = config_content.replace("GPU: [0, 1]", "GPU: [0]")
-
                 with config_file.open("w") as f:
                     f.write(config_content)
-
                 config_modified = True
 
-        # ICT uses test.py which calls main(mode=2), enabling test-mode arguments
-        # Use --path to point to the model directory (which contains config.yml)
-        # Set condition_num=1 since we only have one edge map per image
-        cmd = [
+        stage2_cmd = [
             "python",
             "test.py",
-            "--path",
-            str(model_path),
-            "--model",
-            "2",  # Inpaint model
             "--input",
             str(project_root / "data" / "oai" / "test" / "img" / "subset_4"),
             "--mask",
             str(project_root / "data" / "oai" / "test" / "mask" / "subset_4"),
-            "--prior",  # ICT calls edge data "prior"
-            str(edge_base),
+            "--prior",
+            str(stage1_output),  # Transformer priors, NOT edges!
             "--output",
             str(output_dir),
-            "--condition_num",
-            "1",  # We have 1 edge map per image, not 8
+            "--path",
+            str(model_path),
+            "--model",
+            "2",
+            "--Generator",
+            "4",
+            "--test_batch_size",
+            "1",
         ]
 
-        # Set CUDA_VISIBLE_DEVICES to only use GPU 0 (Colab has 1 GPU)
-        # This overrides config files that may specify multiple GPUs
-        env = os.environ.copy()
-        env["CUDA_VISIBLE_DEVICES"] = "0"
-
-        success, _output, elapsed = self.run_command(
-            cmd,
-            f"ICT {variant_name}",
+        stage2_success, _, _stage2_time = self.run_command(
+            stage2_cmd,
+            "Guided Upsample",
             cwd=project_root / "models" / "ict" / "Guided_Upsample",
             env=env,
+            timeout=300,
         )
 
-        # Restore original config if it was modified
+        # Restore config
         if config_modified and config_backup.exists():
             shutil.move(str(config_backup), str(config_file))
-            self.log(f"Restored original {variant_name} config", "INFO")
 
-        return success, elapsed
+        total_time = time.time() - total_start
+        if stage2_success:
+            self.log(f"Total: {total_time:.1f}s", "SUCCESS")
+
+        return stage2_success, total_time
 
     def test_ict_all(self) -> List[Dict]:
         """Test all ICT variants."""
