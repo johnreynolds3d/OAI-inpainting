@@ -67,11 +67,26 @@ def main(conf: conf_mgt.Default_Conf):
     model, diffusion = create_model_and_diffusion(
         **select_args(conf, model_and_diffusion_defaults().keys()), conf=conf
     )
-    model.load_state_dict(
-        dist_util.load_state_dict(
-            os.path.expanduser(conf.model_path), map_location="cpu"
-        )
+
+    # Load checkpoint state dict
+    checkpoint_state = dist_util.load_state_dict(
+        os.path.expanduser(conf.model_path), map_location="cpu"
     )
+
+    # Strip class-conditional keys if present (ImageNet models may have label_emb)
+    # RePaint uses unconditional generation, so we remove class conditioning keys
+    if "label_emb.weight" in checkpoint_state:
+        print(
+            "   ⚠️  Detected class-conditional checkpoint (label_emb) - stripping for unconditional use..."
+        )
+        keys_to_remove = [
+            k for k in checkpoint_state if k.startswith("label_emb")
+        ]
+        for key in keys_to_remove:
+            del checkpoint_state[key]
+        print(f"   ✅ Removed {len(keys_to_remove)} class-conditional keys")
+
+    model.load_state_dict(checkpoint_state)
     model.to(device)
     if conf.use_fp16:
         model.convert_to_fp16()
