@@ -714,6 +714,106 @@ OAI-inpainting/
 
 ---
 
+## 📤 Sharing Data with Collaborators
+
+### For Data Owners: How to Share
+
+**Goal:** Share your OAI data with collaborators while keeping results private.
+
+**1. Share Data Folder (Read-Only)**
+
+In Google Drive:
+1. Navigate to: `/MyDrive/Colab Notebooks/OAI_untracked/data/`
+2. Right-click on `data` folder → Share → Share
+3. Set: **"Anyone with the link"** + **"Viewer"** (read-only)
+4. Copy and share the link
+
+**Important:** Only share `data/` folder, NOT `results/`!
+
+**2. Share Instructions**
+
+Provide users with:
+```
+📥 OAI Inpainting Shared Data
+
+Sharing Link: [your-link-here]
+
+Setup:
+1. Click link → "Add shortcut to Drive"
+2. See README.md "Using Shared Data" section
+3. Run Colab notebook
+4. Results save to YOUR OWN directory
+
+Data is read-only - your results stay private!
+```
+
+### For Data Consumers: Using Shared Data
+
+**If using someone's shared read-only data:**
+
+**Option A: Manual Copy in Colab**
+
+```python
+# In a Colab cell after mounting Drive and cloning repo:
+from pathlib import Path
+import shutil
+
+# Copy shared data (update path to your shortcut location)
+shared_path = Path("/content/drive/MyDrive/[shortcut-name]/data")
+shutil.copytree(shared_path, "data", dirs_exist_ok=True)
+
+# Create YOUR OWN results directory
+Path("../OAI_untracked/results").mkdir(parents=True, exist_ok=True)
+Path("results").symlink_to("../OAI_untracked/results/")
+
+print("✅ Data copied from shared source")
+print("✅ Results will save to YOUR directory")
+```
+
+**Option B: Get Your Own Copy**
+
+Ask the data owner to share the data, then:
+1. Download the shared data to your local machine
+2. Upload to your own Google Drive: `Colab Notebooks/OAI_untracked/data/`
+3. Follow the normal setup (Cell 3 creates symlinks automatically)
+
+**Your directory structure with shared data:**
+```
+/content/drive/MyDrive/
+├── [Shared Data Shortcut]/  ← Read-only access to owner's data
+│   └── data/
+├── Colab Notebooks/
+│   ├── OAI-inpainting/
+│   │   ├── data/            ← Local copy from shared (temporary)
+│   │   └── results/         → ../OAI_untracked/results/ (yours!)
+│   └── OAI_untracked/
+│       └── results/         ← YOUR outputs (isolated from owner)
+```
+
+**Benefits:**
+- ✅ No need to store 16GB in your Drive
+- ✅ Your results completely separate from owner's
+- ✅ Quick access to latest shared data
+- ✅ Original data protected (read-only)
+
+**Trade-offs:**
+- ⚠️ Data copied to local Colab (lost on disconnect - just re-copy)
+- ⚠️ Manual setup needed (not automatic like own data)
+
+### Security & Privacy
+
+**For Data Owners:**
+- ✅ Safe to share: `data/` folder (images, models)
+- ❌ Don't share: `results/` folder (experiments, outputs)
+- ✅ Read-only prevents modifications to your data
+
+**For Data Consumers:**
+- ✅ Your results: Saved to YOUR Drive space
+- ✅ Your privacy: No access to owner's results
+- ✅ Your experiments: Remain private
+
+---
+
 ## 🔧 Troubleshooting
 
 ### Google Colab Issues
