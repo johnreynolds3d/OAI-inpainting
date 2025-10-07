@@ -46,6 +46,8 @@ Thumbs.db
 
 # Model-specific temporary files
 checkpoints/
-results/
 logs/
+
+# Data and results symlinks (never track these!)
 data
+results
