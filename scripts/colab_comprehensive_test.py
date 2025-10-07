@@ -205,7 +205,7 @@ class ModelTester:
 
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Create temporary config for this test
+        # Create temporary config for Guided_Upsample testing
         config_content = f"""MODE: 2
 MODEL: 2
 MASK: 3
@@ -233,24 +233,25 @@ prior_size: 32
 test_batch_size: 1
 """
 
-        # Create config in models/ict directory
+        # Create config in Guided_Upsample directory (correct location for batch testing)
         config_path = (
             project_root
             / "models"
             / "ict"
+            / "Guided_Upsample"
             / f"test_subset_4_{variant_name.lower()}.yml"
         )
         with config_path.open("w") as f:
             f.write(config_content)
 
-        # Note: ICT testing requires specific setup
-        # This is a simplified version - actual implementation may need adjustment
-        cmd = ["python", "run.py", "--config", str(config_path)]
+        # Use main.py with mode 2 (testing mode) - this is for batch testing
+        # Run from Guided_Upsample directory which has the proper test infrastructure
+        cmd = ["python", "main.py", "--mode", "2", "--config", config_path.name]
 
         success, _output, elapsed = self.run_command(
             cmd,
             f"ICT {variant_name}",
-            cwd=project_root / "models" / "ict",
+            cwd=project_root / "models" / "ict" / "Guided_Upsample",
         )
 
         # Clean up config
