@@ -14,6 +14,7 @@ Total: 9 model variants tested on 4 OAI X-ray images
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 import time
@@ -50,7 +51,7 @@ class ModelTester:
         print(f"[{timestamp}] {emoji} {message}")
 
     def run_command(
-        self, cmd: List[str], description: str, cwd=None, timeout=None
+        self, cmd: List[str], description: str, cwd=None, timeout=None, env=None
     ) -> Tuple[bool, str, float]:
         """Run command with timeout and error handling."""
         if timeout is None:
@@ -69,6 +70,7 @@ class ModelTester:
                 capture_output=True,
                 text=True,
                 timeout=timeout,
+                env=env,
             )
             elapsed = time.time() - start_time
 
@@ -205,9 +207,21 @@ class ModelTester:
 
         output_dir.mkdir(parents=True, exist_ok=True)
 
+        # ICT expects edge files in condition_N subdirectories for testing
+        # Create condition_1 directory with symlinks to actual edge files
+        edge_base = project_root / "data" / "oai" / "test" / "edge" / "subset_4"
+        condition_1_dir = edge_base / "condition_1"
+        condition_1_dir.mkdir(parents=True, exist_ok=True)
+
+        # Create symlinks for each edge file in condition_1/
+        for edge_file in edge_base.glob("*.png"):
+            symlink_path = condition_1_dir / edge_file.name
+            if not symlink_path.exists():
+                symlink_path.symlink_to(edge_file)
+
         # ICT uses test.py which calls main(mode=2), enabling test-mode arguments
         # Use --path to point to the model directory (which contains config.yml)
-        # Use --input, --mask, --prior (edge), --output to specify test data
+        # Set condition_num=1 since we only have one edge map per image
         cmd = [
             "python",
             "test.py",
@@ -220,15 +234,23 @@ class ModelTester:
             "--mask",
             str(project_root / "data" / "oai" / "test" / "mask" / "subset_4"),
             "--prior",  # ICT calls edge data "prior"
-            str(project_root / "data" / "oai" / "test" / "edge" / "subset_4"),
+            str(edge_base),
             "--output",
             str(output_dir),
+            "--condition_num",
+            "1",  # We have 1 edge map per image, not 8
         ]
+
+        # Set CUDA_VISIBLE_DEVICES to only use GPU 0 (Colab has 1 GPU)
+        # This overrides config files that may specify multiple GPUs
+        env = os.environ.copy()
+        env["CUDA_VISIBLE_DEVICES"] = "0"
 
         success, _output, elapsed = self.run_command(
             cmd,
             f"ICT {variant_name}",
             cwd=project_root / "models" / "ict" / "Guided_Upsample",
+            env=env,
         )
 
         return success, elapsed
