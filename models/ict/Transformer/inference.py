@@ -160,8 +160,11 @@ if __name__ == "__main__":
             for i in range(n_samples):
                 current_url = os.path.join(opts.save_url, "condition_%d" % (i + 1))
                 os.makedirs(current_url, exist_ok=True)
+                # Move pixels to CPU before indexing C (color palette is on CPU)
+                # Fix for: RuntimeError: indices should be on same device as indexed tensor
+                pixels_cpu = pixels[i].cpu() if pixels[i].is_cuda else pixels[i]
                 current_img = (
-                    C[pixels[i]]
+                    C[pixels_cpu]
                     .view(opts.image_size, opts.image_size, 3)
                     .numpy()
                     .astype(np.uint8)
