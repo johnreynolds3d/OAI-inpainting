@@ -205,12 +205,12 @@ class ModelTester:
 
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        # ICT uses command-line arguments and expects config.yml in the checkpoint directory
+        # ICT uses test.py which calls main(mode=2), enabling test-mode arguments
         # Use --path to point to the model directory (which contains config.yml)
-        # Use --input, --mask, --output to specify test data paths
+        # Use --input, --mask, --prior (edge), --output to specify test data
         cmd = [
             "python",
-            "main.py",
+            "test.py",
             "--path",
             str(model_path),
             "--model",
@@ -219,7 +219,7 @@ class ModelTester:
             str(project_root / "data" / "oai" / "test" / "img" / "subset_4"),
             "--mask",
             str(project_root / "data" / "oai" / "test" / "mask" / "subset_4"),
-            "--edge",
+            "--prior",  # ICT calls edge data "prior"
             str(project_root / "data" / "oai" / "test" / "edge" / "subset_4"),
             "--output",
             str(output_dir),
