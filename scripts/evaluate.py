@@ -20,10 +20,13 @@ from sklearn.metrics import accuracy_score
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from classifier.resnet50 import model
+from classifier.resnet50 import model  # noqa: E402
+
+# Constants
+CLASSIFICATION_THRESHOLD = 0.5
 
 
-def calculate_inpainting_metrics(gt_images, inpainted_images, masks):
+def calculate_inpainting_metrics(gt_images, inpainted_images, masks):  # noqa: ARG001
     """Calculate inpainting quality metrics."""
     metrics = {}
 
@@ -85,7 +88,7 @@ def evaluate_classification_performance(gt_images, inpainted_images, labels):
             # Get prediction
             output = classifier(img_tensor)
             probability = torch.sigmoid(output).item()
-            prediction = 1 if probability > 0.5 else 0
+            prediction = 1 if probability > CLASSIFICATION_THRESHOLD else 0
 
             results["gt_predictions"].append(prediction)
             results["gt_probabilities"].append(probability)
@@ -99,7 +102,7 @@ def evaluate_classification_performance(gt_images, inpainted_images, labels):
             # Get prediction
             output = classifier(img_tensor)
             probability = torch.sigmoid(output).item()
-            prediction = 1 if probability > 0.5 else 0
+            prediction = 1 if probability > CLASSIFICATION_THRESHOLD else 0
 
             results["inpainted_predictions"].append(prediction)
             results["inpainted_probabilities"].append(probability)
@@ -234,7 +237,7 @@ def main():
 
         # Load inpainted images
         inpainted_dir = (
-            project_root / "output" / model_name.upper() / "OAI" / args.subset
+            project_root / "results" / model_name.upper() / "OAI" / args.subset
         )
         if not inpainted_dir.exists():
             print(f"⚠️  Inpainted images not found for {model_name}: {inpainted_dir}")
