@@ -2,7 +2,7 @@
 """
 Generate Comparison Strips for Model Evaluation
 Creates horizontal strips showing: GT, GT+Mask, and all model variant outputs
-Optimized for visual comparison and thesis inclusion.
+Optimized for visual comparison and publication.
 """
 
 import sys

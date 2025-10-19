@@ -6,7 +6,7 @@ Comprehensive Metrics Evaluation for Existing Model Outputs
 Calculates MAE, SSIM, PSNR, and FID on already-generated inpainting results.
 NO need to re-run model testing - works on existing outputs!
 
-Perfect for last-minute metrics generation before PhD presentation.
+Perfect for comprehensive metrics generation and analysis.
 
 Usage in Colab:
 !cd /content/drive/MyDrive/Colab\\ Notebooks/OAI-inpainting && python scripts/colab_evaluation_metrics.py

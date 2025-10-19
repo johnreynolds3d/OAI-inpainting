@@ -315,7 +315,7 @@ Creating horizontal strips showing:
 📊 Also created:
   • all_comparisons_summary.png (all strips stacked)
 
-💡 Perfect for visual assessment and thesis inclusion!
+💡 Perfect for visual assessment and publication!
 💡 Next step: Run Cell 7 to download all results as ZIP
 ```
 

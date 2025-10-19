@@ -1,6 +1,6 @@
 # OAI X-ray Inpainting Project
 
-Comprehensive implementation and comparison of state-of-the-art deep learning inpainting methods for X-ray image analysis on the Osteoarthritis Initiative (OAI) dataset.
+Comprehensive implementation and comparison of state-of-the-art deep learning inpainting methods for wrist X-ray image analysis on the Osteoarthritis Initiative (OAI) dataset.
 
 ### 📓 Google Colab Notebooks
 
