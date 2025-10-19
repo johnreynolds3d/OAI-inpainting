@@ -15,11 +15,15 @@ import numpy as np
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+# Constants
+GRAYSCALE_NDIM = 2
+MASK_THRESHOLD = 127
+
 
 def create_gt_with_mask(gt_img: np.ndarray, mask_img: np.ndarray) -> np.ndarray:
     """Create GT with red mask overlay."""
     # Convert grayscale to RGB for red overlay
-    if len(gt_img.shape) == 2:
+    if len(gt_img.shape) == GRAYSCALE_NDIM:
         gt_rgb = cv2.cvtColor(gt_img, cv2.COLOR_GRAY2RGB)
     else:
         gt_rgb = gt_img.copy()
@@ -29,7 +33,7 @@ def create_gt_with_mask(gt_img: np.ndarray, mask_img: np.ndarray) -> np.ndarray:
     red_overlay[:, :, 2] = 255  # Red channel (BGR format)
 
     # Apply mask (white areas in mask)
-    mask_bool = mask_img > 127
+    mask_bool = mask_img > MASK_THRESHOLD
     gt_with_mask = gt_rgb.copy()
     gt_with_mask[mask_bool] = red_overlay[mask_bool]
 
@@ -39,21 +43,21 @@ def create_gt_with_mask(gt_img: np.ndarray, mask_img: np.ndarray) -> np.ndarray:
 def load_model_outputs(img_name: str, results_base: Path) -> dict:
     """Load all model variant outputs for an image."""
     model_outputs = {}
-    
+
     # Model families and their variants
     models_to_check = [
         ("AOT-GAN", ["CelebA-HQ", "Places2", "OAI"]),
         ("ICT", ["FFHQ", "ImageNet", "Places2_Nature", "OAI"]),
         ("RePaint", ["CelebA-HQ", "ImageNet", "Places2"]),
     ]
-    
+
     for model_family, variants in models_to_check:
         for variant in variants:
             variant_dir = results_base / model_family / variant / "subset_4"
-            
+
             if not variant_dir.exists():
                 continue
-            
+
             # Look for the image in various possible locations/names
             possible_patterns = [
                 img_name,
@@ -62,10 +66,10 @@ def load_model_outputs(img_name: str, results_base: Path) -> dict:
                 img_name.replace(".png", "_output.png"),
                 img_name.replace(".png", "_0.png"),  # ICT format
             ]
-            
+
             # Also check in subdirectories (RePaint uses 'inpainted/')
             subdirs_to_check = [".", "inpainted", "results", "output"]
-            
+
             found = False
             for subdir in subdirs_to_check:
                 if found:
@@ -73,7 +77,7 @@ def load_model_outputs(img_name: str, results_base: Path) -> dict:
                 check_dir = variant_dir / subdir if subdir != "." else variant_dir
                 if not check_dir.exists():
                     continue
-                    
+
                 for pattern in possible_patterns:
                     img_path = check_dir / pattern
                     if img_path.exists():
@@ -82,7 +86,7 @@ def load_model_outputs(img_name: str, results_base: Path) -> dict:
                             model_outputs[f"{model_family} {variant}"] = img
                             found = True
                             break
-    
+
     return model_outputs
 
 
@@ -107,7 +111,7 @@ def add_labels_to_strip(
     for i, label in enumerate(labels):
         x_start = i * image_width
         x_center = x_start + image_width // 2
-        
+
         # Get text size for centering
         text_size = cv2.getTextSize(label, font, font_scale, font_thickness)[0]
         text_x = x_center - text_size[0] // 2
@@ -229,7 +233,7 @@ def create_comparison_strip(
     for img in strip_images:
         resized = cv2.resize(img, target_size)
         # Convert to RGB for consistent concatenation
-        if len(resized.shape) == 2:
+        if len(resized.shape) == GRAYSCALE_NDIM:
             resized = cv2.cvtColor(resized, cv2.COLOR_GRAY2RGB)
         resized_images.append(resized)
 
@@ -246,7 +250,7 @@ def create_comparison_strip(
     output_dir.mkdir(parents=True, exist_ok=True)
     base_name = img_name.replace(".png", "")
     strip_path = output_dir / f"comparison_{base_name}.png"
-    
+
     cv2.imwrite(str(strip_path), cv2.cvtColor(strip_with_filename, cv2.COLOR_RGB2BGR))
     print(f"  ✅ Saved: {strip_path.name}")
 
@@ -292,9 +296,9 @@ def create_summary_figure(strip_paths: list, output_dir: Path) -> Path:
     # Add title
     title_height = 60
     total_height = summary_img.shape[0] + title_height
-    summary_with_title = np.ones(
-        (total_height, summary_img.shape[1], 3), dtype=np.uint8
-    ) * 255
+    summary_with_title = (
+        np.ones((total_height, summary_img.shape[1], 3), dtype=np.uint8) * 255
+    )
     summary_with_title[title_height:, :] = summary_img
 
     # Add title text
@@ -347,7 +351,7 @@ def main():
         sys.exit(1)
 
     # Get all images from subset_4
-    test_images = sorted(list(gt_dir.glob("*.png")))
+    test_images = sorted(gt_dir.glob("*.png"))
 
     if not test_images:
         print(f"\n❌ No images found in {gt_dir}")
@@ -381,4 +385,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

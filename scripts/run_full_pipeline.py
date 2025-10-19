@@ -46,7 +46,6 @@ class PipelineRunner:
         description: str,
         cwd: Optional[Path] = None,
         timeout: int = 3600,
-        phase: str = "",
     ) -> Tuple[bool, str]:
         """Run a command with timeout and error handling."""
         self.log(f"Starting: {description}", "PHASE")
@@ -96,7 +95,7 @@ class PipelineRunner:
             return False
 
         # Test AOT-GAN on subset
-        success, output = self.run_command(
+        success, _output = self.run_command(
             [
                 "python",
                 "scripts/test_subset_4.py",
@@ -114,7 +113,7 @@ class PipelineRunner:
             return False
 
         # List available models
-        success, output = self.run_command(
+        success, _output = self.run_command(
             ["python", "scripts/test_subset_4.py", "--list-models"],
             "Listing available models",
             timeout=60,
@@ -139,7 +138,7 @@ class PipelineRunner:
             return True
 
         # Start AOT-GAN training
-        success, output = self.run_command(
+        success, _output = self.run_command(
             [
                 "python",
                 "scripts/train.py",
@@ -175,7 +174,7 @@ class PipelineRunner:
             return True
 
         # Start ICT training
-        success, output = self.run_command(
+        success, _output = self.run_command(
             [
                 "python",
                 "scripts/train.py",
@@ -211,7 +210,7 @@ class PipelineRunner:
             return True
 
         # Run RePaint inference
-        success, output = self.run_command(
+        success, _output = self.run_command(
             [
                 "python",
                 "scripts/test.py",
@@ -241,7 +240,7 @@ class PipelineRunner:
             return False
 
         # Run comprehensive evaluation
-        success, output = self.run_command(
+        success, _output = self.run_command(
             [
                 "python",
                 "scripts/evaluate.py",
@@ -361,10 +360,9 @@ def main():
         }
 
         for phase in args.phases:
-            if phase in phase_map:
-                if not phase_map[phase]():
-                    success = False
-                    break
+            if phase in phase_map and not phase_map[phase]():
+                success = False
+                break
 
     sys.exit(0 if success else 1)
 

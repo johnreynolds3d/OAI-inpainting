@@ -19,6 +19,11 @@ __pycache__/
 *$py.class
 *.so
 
+# Python package build artifacts
+*.egg-info/
+dist/
+build/
+
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 

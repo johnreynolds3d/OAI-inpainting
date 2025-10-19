@@ -249,7 +249,7 @@ def evaluate_classification():
             predictions = []
             true_labels = []
 
-            for img_name in gt_labels.keys():
+            for img_name, label in gt_labels.items():
                 pred_path = find_model_output(
                     results_base, model_family, variant, img_name
                 )
@@ -260,7 +260,7 @@ def evaluate_classification():
 
                     if pred is not None:
                         predictions.append(pred)
-                        true_labels.append(gt_labels[img_name])
+                        true_labels.append(label)
 
             if predictions:
                 accuracy = np.mean(np.array(predictions) == np.array(true_labels))
@@ -317,4 +317,5 @@ if __name__ == "__main__":
         print(f"\n⚠️  Classification evaluation failed: {e}")
         print("💡 This requires a trained ResNet50 model on OAI data")
         import traceback
+
         traceback.print_exc()
