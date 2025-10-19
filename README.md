@@ -2,7 +2,13 @@
 
 Comprehensive implementation and comparison of state-of-the-art deep learning inpainting methods for X-ray image analysis on the Osteoarthritis Initiative (OAI) dataset.
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/johnreynolds3d/OAI-inpainting/blob/master/notebooks/OAI_Inpainting_Colab.ipynb)
+### 📓 Google Colab Notebooks
+
+**🚀 Streamlined (Recommended)** - 7 cells, one-click actions
+[![Open Streamlined](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/johnreynolds3d/OAI-inpainting/blob/master/notebooks/OAI_Inpainting_Streamlined.ipynb)
+
+**📚 Full Version** - 30+ cells, detailed control
+[![Open Full](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/johnreynolds3d/OAI-inpainting/blob/master/notebooks/OAI_Inpainting_Colab.ipynb)
 
 ---
 
@@ -57,7 +63,11 @@ Each architecture has been pretrained on multiple datasets, giving you **9 total
 
 ### Option 1: Google Colab (Recommended)
 
-**Best for:** Quick testing, no local GPU required
+**Best for:** Quick testing, no local GPU required, cloud-based training
+
+Choose your workflow:
+- **Streamlined Notebook** (7 cells) - Simple, efficient, recommended for most users
+- **Full Notebook** (30+ cells) - Detailed control, all options exposed
 
 **Colab Link:** https://colab.research.google.com/github/johnreynolds3d/OAI-inpainting/blob/master/notebooks/OAI_Inpainting_Colab.ipynb
 
