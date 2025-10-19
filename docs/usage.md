@@ -197,7 +197,7 @@ model:
 data:
   gt_path: "./data/oai/test/img"
   mask_path: "./data/oai/test/mask"
-  output_path: "./output/RePaint/OAI"
+  output_path: "./results/RePaint/OAI"
 
 inference:
   sample_num: 1
@@ -257,7 +257,7 @@ This will:
 ### Output Structure
 
 ```
-output/
+results/
 ├── AOT-GAN/
 │   └── OAI/
 │       ├── test/         # Full test set results
@@ -279,7 +279,7 @@ output/
 python scripts/evaluate.py \
     --models aot-gan ict repaint \
     --subset subset_4 \
-    --output results/evaluation/comprehensive
+    --output-dir results/evaluation/comprehensive
 
 # View results
 ls results/evaluation/comprehensive/

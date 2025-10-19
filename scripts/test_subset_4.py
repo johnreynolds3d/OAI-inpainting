@@ -494,22 +494,22 @@ def main():
 
     # Print output directories
     print("\n📁 Output directories:")
+    # Get project root dynamically (works in both local and Colab)
+    project_root = Path(__file__).parent.parent.resolve()
+
     for model_name, result in all_results:
         if result:  # Only show directories for successful tests
             if "AOT-GAN" in model_name:
                 variant = model_name.split()[-1]
-                base_path = "/var/home/john/Documents/Code/OAI-inpainting"
-                path = f"{base_path}/results/AOT-GAN/{variant}/subset_4"
+                path = project_root / "results" / "AOT-GAN" / variant / "subset_4"
                 print(f"   {model_name}: {path}")
             elif "ICT" in model_name:
                 variant = model_name.split()[-1]
-                base_path = "/var/home/john/Documents/Code/OAI-inpainting"
-                path = f"{base_path}/results/ICT/{variant}/subset_4"
+                path = project_root / "results" / "ICT" / variant / "subset_4"
                 print(f"   {model_name}: {path}")
             elif "RePaint" in model_name:
                 variant = model_name.split()[-1]
-                base_path = "/var/home/john/Documents/Code/OAI-inpainting"
-                path = f"{base_path}/results/RePaint/{variant}/subset_4"
+                path = project_root / "results" / "RePaint" / variant / "subset_4"
                 print(f"   {model_name}: {path}")
 
     # Determine exit status
