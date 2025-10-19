@@ -36,7 +36,7 @@ use_ddim: false
 latex_name: RePaint
 method_name: Repaint
 image_size: 256
-model_path: /var/home/john/Documents/Code/OAI-inpainting/data/pretrained/repaint/256x256_diffusion.pt
+model_path: ./data/pretrained/repaint/256x256_diffusion.pt
 name: test_subset_4
 inpa_inj_sched_prev: true
 n_jobs: 1
@@ -51,8 +51,8 @@ data:
   eval:
     subset_4_test:
       mask_loader: true
-      gt_path: /var/home/john/Documents/Code/OAI-inpainting/data/oai/test/img/subset_4
-      mask_path: /var/home/john/Documents/Code/OAI-inpainting/data/oai/test/mask/subset_4
+      gt_path: ./data/oai/test/img/subset_4
+      mask_path: ./data/oai/test/mask/subset_4
       image_size: 256
       class_cond: false
       deterministic: true
@@ -65,7 +65,7 @@ data:
       offset: 0
       max_len: 4
       paths:
-        srs: /var/home/john/Documents/Code/OAI-inpainting/output/RePaint/ImageNet/subset_4/inpainted
-        lrs: /var/home/john/Documents/Code/OAI-inpainting/output/RePaint/ImageNet/subset_4/gt_masked
-        gts: /var/home/john/Documents/Code/OAI-inpainting/output/RePaint/ImageNet/subset_4/gt
-        gt_keep_masks: /var/home/john/Documents/Code/OAI-inpainting/output/RePaint/ImageNet/subset_4/gt_keep_mask
+        srs: ./results/RePaint/ImageNet/subset_4/inpainted
+        lrs: ./results/RePaint/ImageNet/subset_4/gt_masked
+        gts: ./results/RePaint/ImageNet/subset_4/gt
+        gt_keep_masks: ./results/RePaint/ImageNet/subset_4/gt_keep_mask

@@ -50,4 +50,4 @@ CONTENT_LOSS_WEIGHT: 0.1
 
 # Paths
 PATH: "./results/logs/ict"
-RESULTS: "./output/ICT/OAI"
+RESULTS: "./results/ICT/OAI"

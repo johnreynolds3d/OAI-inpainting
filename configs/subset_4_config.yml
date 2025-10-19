@@ -18,8 +18,8 @@ hardware:
 # Paths
 paths:
   save_dir: "./results/logs/aot-gan/subset_4"
-  outputs: "./output/AOT-GAN/OAI/subset_4"
-  resume: "/var/home/john/Documents/Code/OAI-inpainting/data/pretrained/aot-gan/places2"
+  outputs: "./results/AOT-GAN/OAI/subset_4"
+  resume: "./data/pretrained/aot-gan/places2"
 
 # Loss configuration
 loss:
