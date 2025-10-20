@@ -259,7 +259,7 @@ for result in results['results']:
 | **RePaint** | CelebA-HQ, ImageNet, Places2 | 4 X-rays | ~18-24 min |
 | **Total** | 9 variants | 4 X-rays | **~30-60 min** |
 
-*Test set: 4 OAI X-ray images (2 osteoporotic, 2 normal)*
+*Test set: 4 OAI X-ray images from subset_4 (2 low BMD, 2 high BMD - perfectly balanced)*
 
 ### Output
 
@@ -470,17 +470,21 @@ python split.py
 ```
 
 **This creates:**
-- ✅ Balanced train/valid/test splits (stratified by class)
-- ✅ Random square masks (for inpainting tasks)
-- ✅ Inverted masks (for RePaint model)
-- ✅ Canny edge maps (for ICT model)
-- ✅ subset_4 evaluation set (2 osteoporotic + 2 normal)
+- ✅ **Perfectly balanced train/valid/test splits** (80%/10%/10%)
+  - Uses **ALL 539 images** with mutually exclusive splits
+  - Each split maintains **exact 50/50 balance** of low BMD vs high BMD
+  - Stratified by BMD threshold (median BMD = classification boundary)
+- ✅ **Random square masks** for inpainting tasks
+- ✅ **Canny edge maps** for ICT model's edge-aware inpainting
+- ✅ **subset_4 evaluation set**: 2 low BMD + 2 high BMD images for quick testing
 
 **Split details:**
-- Training: ~70% of data
-- Validation: ~15% of data
-- Testing: ~15% of data
-- All splits maintain class balance (osteoporotic vs normal)
+- **Training**: 80% (431 images: ~216 low BMD, ~215 high BMD)
+- **Validation**: 10% (54 images: ~27 low BMD, ~27 high BMD)
+- **Testing**: 10% (54 images: ~27 low BMD, ~27 high BMD)
+- **Total**: 539 images (100% of available data)
+- **Balance**: Every split maintains equal low/high BMD representation
+- **Exclusivity**: No image appears in multiple splits
 
 ---
 
@@ -910,9 +914,11 @@ sudo python scripts/setup_data.py
 ls data/oai/img/*.png | wc -l  # Should show 539
 ```
 
-**File naming:**
-- Osteoporotic cases: `6.C.1_*.png`
-- Normal cases: `6.E.1_*.png`
+**File naming convention:**
+- `6.C.1_*.png` - OAI project code 6, visit C.1 (could be low or high BMD)
+- `6.E.1_*.png` - OAI project code 6, visit E.1 (could be low or high BMD)
+- BMD classification (low vs high) is determined by median threshold, not filename
+- See `data.csv` for actual BMD values and classifications
 
 #### "Model files missing"
 **Solution:**
