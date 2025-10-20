@@ -55,4 +55,8 @@ logs/
 
 # Data and results symlinks (never track these!)
 data
-results
+
+# Results directory (ignore everything except comparison strips for README)
+results/
+!results/comparison_strips/
+!results/comparison_strips/all_comparisons_summary.png

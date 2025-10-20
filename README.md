@@ -39,6 +39,19 @@ This project implements and compares **three state-of-the-art inpainting methods
 - **ICT** - Image Completion Transformer
 - **RePaint** - Repaint-based diffusion model for inpainting
 
+### 🎨 Visual Results
+
+Side-by-side comparison of all model variants on OAI wrist X-rays:
+
+![Model Comparison](results/comparison_strips/all_comparisons_summary.png)
+
+*From left to right: Ground Truth | Masked Input | 8 Model Variants (AOT-GAN: CelebA-HQ, Places2 | ICT: FFHQ, ImageNet, Places2_Nature | RePaint: CelebA-HQ, ImageNet, Places2)*
+
+**Key Findings:**
+- 🏆 **AOT-GAN CelebA-HQ**: Best overall performance (19.92 dB PSNR)
+- 📊 **Quantitative metrics**: PSNR, SSIM, MAE calculated for all variants
+- 🔬 **Balanced dataset**: 539 images split 80/10/10 (train/val/test) with equal low/high BMD distribution
+
 ### Model Variants Available
 
 Each architecture has been pretrained on multiple datasets, giving you **9 total model variants** to test:
