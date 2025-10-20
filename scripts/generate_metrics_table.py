@@ -7,6 +7,7 @@ Creates presentation-ready tables with PSNR, SSIM, and classification accuracy.
 import sys
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from PIL import Image
@@ -78,6 +79,140 @@ def find_inpainted_images(results_dir: Path, model_family: str, variant: str):
             return path
 
     return None
+
+
+def create_table_images(df, output_dir):
+    """Create presentation-ready table images (PNG and PDF)."""
+    # Sort by PSNR for better presentation
+    df_sorted = df.sort_values(by="PSNR (dB)", ascending=False).reset_index(drop=True)
+
+    # Create figure with custom styling
+    fig, ax = plt.subplots(figsize=(14, 8))
+    ax.axis("off")
+
+    # Prepare table data
+    table_data = []
+    for _, row in df_sorted.iterrows():
+        # Handle N/A values
+        psnr_str = (
+            f"{row['PSNR (dB)']:.2f}"
+            if isinstance(row["PSNR (dB)"], (int, float))
+            else str(row["PSNR (dB)"])
+        )
+        ssim_str = (
+            f"{row['SSIM']:.4f}"
+            if isinstance(row["SSIM"], (int, float))
+            else str(row["SSIM"])
+        )
+        mae_str = (
+            f"{row['MAE']:.2f}"
+            if isinstance(row["MAE"], (int, float))
+            else str(row["MAE"])
+        )
+
+        table_data.append(
+            [
+                row["Model Family"],
+                row["Variant"],
+                psnr_str,
+                ssim_str,
+                mae_str,
+                str(row["Images"]),
+                row["Status"],
+            ]
+        )
+
+    # Column headers
+    headers = [
+        "Model Family",
+        "Variant",
+        "PSNR (dB)",
+        "SSIM",
+        "MAE",
+        "Images",
+        "Status",
+    ]
+
+    # Create table
+    table = ax.table(
+        cellText=table_data,
+        colLabels=headers,
+        cellLoc="center",
+        loc="center",
+        bbox=[0, 0, 1, 1],
+    )
+
+    # Style the table
+    table.auto_set_font_size(False)
+    table.set_fontsize(12)
+    table.scale(1, 2.5)
+
+    # Header styling
+    for i in range(len(headers)):
+        cell = table[(0, i)]
+        cell.set_facecolor("#4472C4")
+        cell.set_text_props(weight="bold", color="white", fontsize=14)
+
+    # Data row styling
+    for i in range(1, len(table_data) + 1):
+        # Alternate row colors
+        color = "#E7E6E6" if i % 2 == 0 else "white"
+
+        for j in range(len(headers)):
+            cell = table[(i, j)]
+            cell.set_facecolor(color)
+            cell.set_text_props(fontsize=12)
+
+        # Highlight best performer (first row after sorting)
+        if i == 1:
+            for j in range(len(headers)):
+                cell = table[(i, j)]
+                cell.set_facecolor("#FFE699")
+                cell.set_text_props(weight="bold")
+
+    # Add title
+    title_text = "Inpainting Quality Metrics (subset_4, n=4)"
+    fig.suptitle(title_text, fontsize=18, fontweight="bold", y=0.98)
+
+    # Add subtitle with best model
+    best_row = df_sorted.iloc[0]
+    psnr_val = (
+        f"{best_row['PSNR (dB)']:.2f}"
+        if isinstance(best_row["PSNR (dB)"], (int, float))
+        else str(best_row["PSNR (dB)"])
+    )
+    ssim_val = (
+        f"{best_row['SSIM']:.4f}"
+        if isinstance(best_row["SSIM"], (int, float))
+        else str(best_row["SSIM"])
+    )
+    subtitle = (
+        f"Best Model: {best_row['Model Family']} {best_row['Variant']} | "
+        f"PSNR: {psnr_val} dB | SSIM: {ssim_val}"
+    )
+    fig.text(
+        0.5, 0.94, subtitle, ha="center", fontsize=12, style="italic", color="#444"
+    )
+
+    # Add metrics explanation at bottom
+    explanation = (
+        "PSNR: Peak Signal-to-Noise Ratio (higher is better) | "
+        "SSIM: Structural Similarity Index (0-1, higher is better) | "
+        "MAE: Mean Absolute Error (lower is better)"
+    )
+    fig.text(0.5, 0.02, explanation, ha="center", fontsize=9, color="#666")
+
+    # Save as PNG
+    png_path = output_dir / "metrics_table_presentation.png"
+    plt.savefig(png_path, dpi=300, bbox_inches="tight", facecolor="white")
+    print(f"   📊 PNG saved: {png_path}")
+
+    # Save as PDF
+    pdf_path = output_dir / "metrics_table_presentation.pdf"
+    plt.savefig(pdf_path, format="pdf", bbox_inches="tight", facecolor="white")
+    print(f"   📄 PDF saved: {pdf_path}")
+
+    plt.close()
 
 
 def main():
@@ -209,6 +344,10 @@ def main():
         f.write("- **SSIM**: Structural Similarity Index (0-1, higher is better)\n")
         f.write("- **MAE**: Mean Absolute Error (lower is better)\n")
     print(f"📝 Markdown table saved to: {markdown_path}")
+
+    # Create presentation-ready table images
+    print("\n🎨 Creating presentation table images...")
+    create_table_images(df, output_dir)
 
     print()
     print("✅ Metrics table generation complete!")
