@@ -43,7 +43,7 @@ This project implements and compares **three state-of-the-art inpainting methods
 
 Side-by-side comparison of all model variants on OAI wrist X-rays:
 
-![Model Comparison](results/comparison_strips/all_comparisons_summary.png)
+![Model Comparison](results_tracked/comparison_strips/all_comparisons_summary.png)
 
 *From left to right: Ground Truth | Masked Input | 8 Model Variants (AOT-GAN: CelebA-HQ, Places2 | ICT: FFHQ, ImageNet, Places2_Nature | RePaint: CelebA-HQ, ImageNet, Places2)*
 
