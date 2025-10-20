@@ -63,20 +63,34 @@ def fix_inverted_images(model_name, result_dir, gt_dir):
     print(f"🔍 Checking {model_name}")
     print(f"{'=' * 70}")
 
+    # Get GT files first, then only process inpainted images that have corresponding GT
+    gt_path = Path(gt_dir)
+    gt_files = {f.name: f for f in sorted(gt_path.glob("*.png"))}
+
+    if not gt_files:
+        print(f"⚠️  No GT images found in {gt_dir}")
+        return
+
     image_files = sorted(result_path.glob("*.png"))
     if not image_files:
         print(f"⚠️  No images found in {result_path}")
         return
 
+    # Filter to only process images that have corresponding GT
+    valid_image_files = [f for f in image_files if f.name in gt_files]
+
+    if len(valid_image_files) < len(image_files):
+        extra_count = len(image_files) - len(valid_image_files)
+        print(
+            f"   Found {len(image_files)} inpainted images, "
+            f"{len(valid_image_files)} match subset_4 GT ({extra_count} extras skipped)"
+        )
+
     inverted_count = 0
     fixed_count = 0
 
-    for img_file in image_files:
-        gt_file = Path(gt_dir) / img_file.name
-
-        if not gt_file.exists():
-            print(f"⚠️  GT not found for {img_file.name}, skipping")
-            continue
+    for img_file in valid_image_files:
+        gt_file = gt_files[img_file.name]
 
         # Check if inverted
         is_inverted = check_if_inverted(gt_file, img_file)
@@ -98,7 +112,7 @@ def fix_inverted_images(model_name, result_dir, gt_dir):
             print(f"  ✅ {img_file.name}: Normal (no fix needed)")
 
     print(f"\n📊 Summary for {model_name}:")
-    print(f"   Total images: {len(image_files)}")
+    print(f"   Total processed: {len(valid_image_files)}")
     print(f"   Inverted: {inverted_count}")
     print(f"   Fixed: {fixed_count}")
 
